@@ -98,6 +98,7 @@ Route::resource('styles', WritingStyleController::class)
 // WRTITINGSTYLE Custom Routes
 Route::prefix('styles')->name('styles.')->middleware(['auth', 'verified', 'owns-resource:App\Models\WritingStyle'])->group(function () {
     Route::post('/{writingStyle}/examples', [WritingStyleExampleController::class, 'store'])->name('storeExample');
+    Route::post('/examples/analyze', [WritingStyleExampleController::class, 'analyze'])->name('analyzeExample');
 });
 
 Route::middleware('auth')->group(function () {

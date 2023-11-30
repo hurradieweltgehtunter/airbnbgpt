@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WritingStyleExample;
 use Illuminate\Http\Request;
 use App\Models\WritingStyle;
+use App\Models\Agent;
 
 class WritingStyleExampleController extends Controller
 {
@@ -49,6 +50,23 @@ class WritingStyleExampleController extends Controller
     public function show(WritingStyleExample $writingStyleExample)
     {
         //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function analyze (Request $request)
+    {
+        // Validate input. content must be set, not empty, a string and at minimum 500 cahracter long
+        $validated = $request->validate([
+            'content' => 'required|string|min:500'
+        ]);
+
+        // Create a new wrtigin style analyzer agent
+        $agent = Agent::CreateFromName('WritingStyleAnalyzerAgent');
+        $writingStyle = $agent->run($validated['content']);
+
+        return response()->json($writingStyle);
     }
 
     /**

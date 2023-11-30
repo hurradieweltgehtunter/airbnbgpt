@@ -30,7 +30,7 @@ export default class WritingStyle {
 
   async create (data = {}) {
     try {
-      const response = await axios.post(`/writingstyles`, data);
+      const response = await axios.post(route('styles.store'), data);
       // Add properties of data to this.data if the property exists in this.data
       Object.keys(this.data).forEach(key => {
         if (response.data.hasOwnProperty(key)) {
@@ -94,4 +94,3 @@ export default class WritingStyle {
     return agent
   }
 }
-
