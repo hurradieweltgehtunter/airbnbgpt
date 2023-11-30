@@ -18,7 +18,7 @@
   <header>
     <nav class="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 left-0 border-b border-gray-200 dark:border-gray-600">
       <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto py-2">
-      <a href="/dashboard" class="flex items-center">
+      <a :href="route('dashboard')" class="flex items-center">
           <img src="/images/logo.png" class="h-8 mr-3" alt="AirBnB-GPT Logo" />
           <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">AirBnB-GPT</span>
       </a>
@@ -27,7 +27,7 @@
         <ul class="flex flex-col mt-4 font-medium md:flex-row md:mt-0 md:space-x-8 rtl:space-x-reverse">
 
           <li v-if="user.is_admin">
-            <a href="/availableagents" class="block py-2 px-3 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-600 md:p-0 dark:text-blue-500 md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-blue-500 md:dark:hover:bg-transparent dark:border-gray-700" aria-current="page">Available Agents</a>
+            <a :href="route('availableagents.index')" class="block py-2 px-3 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-600 md:p-0 dark:text-blue-500 md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-blue-500 md:dark:hover:bg-transparent dark:border-gray-700" aria-current="page">Available Agents</a>
           </li>
         </ul>
       </div>

@@ -6,10 +6,21 @@ use App\Http\Controllers\HousingController;
 use App\Http\Controllers\WritingStyleController;
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\AvailableAgentController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HousingRoomController;
+use App\Http\Controllers\HousingImageController;
+use App\Http\Controllers\WritingStyleExampleController;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Models\Agent;
+
+use App\Http\Resources\HousingIndexResource;
+use App\Http\Resources\WritingStyleIndexResource;
+
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,24 +36,7 @@ use Inertia\Inertia;
 Route::get('/', function () {
     // Forward to login
     return redirect()->route('login');
-
-    // return Inertia::render('Welcome', [
-    //     'canLogin' => Route::has('login'),
-    //     'canRegister' => Route::has('register'),
-    //     'laravelVersion' => Application::VERSION,
-    //     'phpVersion' => PHP_VERSION,
-    // ]);
 });
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard', [
-        'is_admin' => Auth::user()->is_admin
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::get('/app', function () {
-    return Inertia::render('App');
-})->name('app');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Forward to dashboard
@@ -51,39 +45,60 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-// Route-Gruppe für Housing-Ressourcen
-Route::prefix('housings')->name('housings.')->middleware(['auth', 'verified'])->group(function () {
-    Route::get('/', [HousingController::class, 'index'])->name('index'); // Liste aller Räume
-    Route::get('/create', [HousingController::class, 'create'])->name('create'); // Formular zum Erstellen eines neuen Raumes
-    Route::post('/', [HousingController::class, 'store'])->name('store'); // Neuen Raum speichern
+Route::prefix('dashboard')->name('dashboard')->middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [DashboardController::class, 'index']);
+});
 
-    Route::get('/{housing}', [HousingController::class, 'show'])->name('show'); // Einzelnen Raum anzeigen
-    Route::get('/{housing}/edit', [HousingController::class, 'edit'])->name('edit'); // Leitet auf den entsprechenden Schritt in der Bearbeitung weiter
+Route::get('/scrape-airbnb', function () {
+    $process = new Process(['node', base_path('resources/js/Scraper/scraper.js')]);
+    $process->run();
+
+    if (!$process->isSuccessful()) {
+        throw new ProcessFailedException($process);
+    }
+
+    echo '<textarea>';
+    print_r($process->getOutput());
+    echo '</textarea>';
+
+    // get housing wiht id 1
+    $housing = \App\Models\Housing::find(1);
+
+    $agent = Agent::createFromName('AirbnbScraperAgent', $housing);
+    $agent->run('asd');
+
+});
+
+
+// HOUSING CRUD Operations
+Route::resource('housings', HousingController::class)
+    ->middleware(['auth', 'verified', 'owns-resource:App\Models\Housing,belongs_to']);
+
+// HOUSING Custom Routes
+Route::prefix('housings')->name('housings.')->middleware(['auth', 'verified', 'owns-resource:App\Models\Housing,belongs_to'])->group(function () {
     Route::get('/{housing}/images', [HousingController::class, 'images'])->name('images'); // Formular zum Bearbeiten eines Raumes
     Route::get('/{housing}/questionnaire', [HousingController::class, 'showQuestionnaire'])->name('showQuestionnaire'); // Formular zum Bearbeiten eines Raumes
-    Route::get('/{housing}/editRooms', [HousingController::class, 'editRooms'])->name('editRooms'); // Formular zum Bearbeiten eines Raumes
     Route::get('/{housing}/style', [HousingController::class, 'writingstyleSelect'])->name('writingstyleSelect'); // Formular zum Bearbeiten eines Raumes
     Route::get('/{housing}/prepare/{writingStyle}', [HousingController::class, 'prepare'])->name('prepare'); // Alles vorbereiten zum Texte generieren
-    Route::get('/{housingId}/run', [HousingController::class, 'run'])->name('run'); // Texte generieren
-    // Route::get('/{housing}/write/{writingStyle}', [HousingController::class, 'write'])->name('write'); // Erstellt die Texte
+    Route::get('/{housing}/run', [HousingController::class, 'run'])->name('run'); // Texte generieren
 
-    Route::put('/{housing}', [HousingController::class, 'update'])->name('update'); // Raumänderungen speichern
-    Route::delete('/{housing}', [HousingController::class, 'destroy'])->name('destroy'); // Einen Raum löschen
+    // Create rooms from images
+    Route::patch('/{housing}/rooms', [HousingRoomController::class, 'create'])->name('createRooms');
 });
 
-Route::prefix('styles')->name('styles.')->middleware(['auth', 'verified'])->group(function () {
-    Route::get('/', [WritingStyleController::class, 'index'])->name('index'); // Liste aller Räume
-    Route::get('/create', [WritingStyleController::class, 'create'])->name('create'); // Formular zum Erstellen eines neuen Raumes
-    Route::post('/create', [WritingStyleController::class, 'store'])->name('store'); // Neuen Raum speichern
+// HousingImages CRUD Operations
+Route::resource('images', HousingImageController::class)
+    ->middleware(['auth', 'verified', 'owns-subresource:App\Models\HousingImage,App\Models\Housing,belongs_to']);
 
-    Route::get('/{writingStyle}', [WritingStyleController::class, 'show'])->name('show'); // Einzelnen Raum anzeigen
+// WRITINGSTYLE CRUD Operations
+Route::resource('styles', WritingStyleController::class)
+    ->except(['edit'])
+    ->middleware(['auth', 'verified', 'owns-resource:App\Models\WritingStyle']);
 
-    Route::put('/{id}', [WritingStyleController::class, 'update'])->name('update'); // Raumänderungen speichern
-    Route::delete('/{id}', [WritingStyleController::class, 'destroy'])->name('destroy'); // Einen Raum löschen
+// WRTITINGSTYLE Custom Routes
+Route::prefix('styles')->name('styles.')->middleware(['auth', 'verified', 'owns-resource:App\Models\WritingStyle'])->group(function () {
+    Route::post('/{writingStyle}/examples', [WritingStyleExampleController::class, 'store'])->name('storeExample');
 });
-
-Route::post('/users', [UsersController::class, 'create'])->name('users.create');
-Route::get('/users', [UsersController::class, 'create'])->name('users.create');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -93,10 +108,8 @@ Route::middleware('auth')->group(function () {
 
 // ADMIN
 
-// Agents
-Route::prefix('availableagents')->name('availableagents.')->middleware(['auth', 'verified', 'isAdmin'])->group(function () {
-    Route::get('/', [AvailableAgentController::class, 'index'])->name('index'); // Liste aller Räume
-    Route::get('/{agentId}', [AvailableAgentController::class, 'show'])->name('show'); // Listet einen Raum
-});
+// Available Agents
+Route::resource('availableagents', AvailableAgentController::class)
+    ->middleware(['auth', 'verified', 'isAdmin']);
 
 require __DIR__.'/auth.php';

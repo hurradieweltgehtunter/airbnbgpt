@@ -30,7 +30,7 @@ export default class WritingStyle {
 
   async create (data = {}) {
     try {
-      const response = await axios.post(`/api/writingstyles`, data);
+      const response = await axios.post(`/writingstyles`, data);
       // Add properties of data to this.data if the property exists in this.data
       Object.keys(this.data).forEach(key => {
         if (response.data.hasOwnProperty(key)) {
@@ -48,9 +48,7 @@ export default class WritingStyle {
         if(this.data.id) {
             await this.update()
         } else {
-            const response = await axios.post(`/api/writingstyles`, this.data);
-            console.log(response)
-
+            const response = await this.create(this.data)
         }
     } catch (error) {
       console.error(error);
@@ -60,7 +58,7 @@ export default class WritingStyle {
   async update () {
     try {
 
-      await axios.put(`/api/writingstyles/${this.data.id}`, this.data);
+      await axios.put(route('writingstyles.update', this.data.id), this.data);
 
     } catch (error) {
       console.error(error);

@@ -3,7 +3,7 @@
   import { Head, router } from '@inertiajs/vue3';
   import { onMounted, ref } from 'vue';
   import AddressAutocomplete from '@/Components/GoogleAutocomplete.vue'
-  import { useHousingStore } from '@/Store/housing'
+  import { useHousingStore } from '@/Store/Housing'
 
   const housingStore = useHousingStore()
 

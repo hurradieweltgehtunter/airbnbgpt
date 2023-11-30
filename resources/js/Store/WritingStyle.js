@@ -5,13 +5,29 @@ import WritingStyle from '@/Models/WritingStyle'
 export const useWritingStyleStore = defineStore('writingStyles', {
   state: () => ({
     writingStyles: [],
-    isLoading: false,
+    isLoading: true,
   }),
   getters: {
     // Fügen Sie hier notwendige Getter hinzu
   },
   actions: {
+    fill(writingStyles) {
+
+        // writingStyles must be of type array
+        if (!Array.isArray(writingStyles)) {
+          throw new Error('WritingStyleStore::fill: writingStyles must be of type array')
+        }
+
+        this.writingStyles = []
+
+        writingStyles.forEach(housing => {
+          this.writingStyles.push(new WritingStyle(housing))
+        })
+
+        this.isLoading = false
+      },
     async fetchAll() {
+      throw new Error('writingStyleStore::fetchAll() is deprecated. Use fill() instead');
       this.isLoading = true;
       try {
         const response = await axios.get('/api/writingstyles');

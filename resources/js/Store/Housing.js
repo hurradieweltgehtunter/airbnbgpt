@@ -5,13 +5,30 @@ import Housing from '@/Models/Housing'
 export const useHousingStore = defineStore('housings', {
   state: () => ({
     housings: [],
-    isLoading: false,
+    isLoading: true,
   }),
   getters: {
     // Fügen Sie hier notwendige Getter hinzu
   },
   actions: {
+    fill(housings) {
+
+      // housings must be of type array
+      if (!Array.isArray(housings)) {
+        throw new Error('HousingStore::fill: housings must be of type array')
+      }
+
+      this.housings = []
+
+      housings.forEach(housing => {
+        this.housings.push(new Housing(housing))
+      })
+
+      this.isLoading = false
+    },
     async fetchHousings() {
+      throw new Error('HousingStore::fetchHousings() is deprecated. Use fill() instead');
+
       this.isLoading = true;
       try {
         const response = await axios.get('/api/housings');
@@ -32,7 +49,7 @@ export const useHousingStore = defineStore('housings', {
       let housing = new Housing(housingData);
 
       try {
-          const response = await axios.post('/api/housings', housing.data);
+          const response = await axios.post('/housings', housing.data);
           housing.data.id = response.data.id;
           this.housings.push(housing);
           return housing;
@@ -44,7 +61,7 @@ export const useHousingStore = defineStore('housings', {
 
     async delete(housing) {
       try {
-        await axios.delete('/api/housings/' + housing.data.id);
+        await axios.delete('/housings/' + housing.data.id);
         this.housings.splice(this.housings.indexOf(housing), 1);
       } catch (error) {
         console.error('Es gab einen Fehler beim Löschen des Housings:', error);

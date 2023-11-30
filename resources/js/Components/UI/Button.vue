@@ -6,11 +6,12 @@
         type: String,
         default: 'button',
     },
-    style: {
+    variant: {
       validator(value) {
         // The value must match one of these strings
         return ['primary', 'secondary', 'hollow', 'facebook'].includes(value)
       },
+      type: String,
       default: 'primary',
       required: false
     },
@@ -33,7 +34,7 @@
   const cssClasses = computed (() => {
     let classes = 'inline-flex items-center px-4 py-2 rounded-md font-semibold text-m shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150'
 
-    switch(props.style) {
+    switch(props.variant) {
       case 'primary':
         classes += ' text-white bg-peachPink-500 hover:bg-peachPink-800'
         break;

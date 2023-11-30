@@ -4,13 +4,11 @@
   import { usePage } from '@inertiajs/vue3'
   import axios from 'axios'
   import Uppy from '@/Components/Uppy.vue'
-  import Spinner from '@/Components/Spinner.vue'
   import Housing from '@/Models/Housing'
   import HousingRoom from '@/Models/HousingRoom'
   import HousingImage from '@/Models/HousingImage'
-  import Agent from '@/Models/Agent'
 
-  import { useHousingStore } from '@/Store/housing'
+  import { useHousingStore } from '@/Store/Housing'
 
   const housingStore = useHousingStore()
 
@@ -33,6 +31,7 @@
 
     return img
   })
+
 
   // Uppy config
   const XHRconfig = computed(() => ({

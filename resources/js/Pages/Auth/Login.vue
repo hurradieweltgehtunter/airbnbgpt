@@ -96,7 +96,7 @@ const submit = () => {
                     Passwort vergessen?
                 </Link>
 
-                <Button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing" :style="'primary'" type="submit">
+                <Button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing" variant="primary" type="submit">
                     Log in
                 </Button>
             </div>

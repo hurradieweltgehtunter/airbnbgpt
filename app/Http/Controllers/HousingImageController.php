@@ -93,8 +93,8 @@ class HousingImageController extends Controller
             ], 500);
         }
 
-        // send 200
-        return response()->json($housingImage->toArray());
+        // Send a 204 response
+        return response()->noContent();
 
     }
 

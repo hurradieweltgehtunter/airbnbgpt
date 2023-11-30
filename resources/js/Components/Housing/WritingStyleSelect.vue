@@ -1,10 +1,10 @@
 <script setup>
-  import { onMounted, ref, defineProps } from 'vue';
+  import { ref, defineProps } from 'vue';
   import { Head, router } from '@inertiajs/vue3'
   import { usePage } from '@inertiajs/vue3'
-
+  import Button from '@/Components/UI/Button.vue';
   const page = usePage()
-  const writingStyles = page.props.writingStyles
+
   const message = 'In welchem Schreibstil möchtest du deine Anzeige verfassen?'
   const selectedWritingStyle = ref(null)
   const emit = defineEmits(['loading', 'setProgress'])
@@ -26,10 +26,6 @@
     }
   })
 
-  onMounted(async () => {
-
-  })
-
   const send = async () => {
     emit('loading', true, 'Ich schreibe deine Anzeige…')
 
@@ -44,13 +40,11 @@
     <div class="w-2/3 font-serif text-lg mb-12">
       <select id="writingStyles" v-model="selectedWritingStyle" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
         <option value="null">Schreibstil wählen...</option>
-        <option v-for="writingStyle in writingStyles" :key="writingStyle.id" :value="writingStyle.id" >{{ writingStyle.title }}</option>
-
+        <option v-for="writingStyle in page.props.writingStyles.data" :key="writingStyle.id" :value="writingStyle.id" >{{ writingStyle.title }}</option>
       </select>
-
     </div>
 
-    <button type="submit" :disabled="selectedWritingStyle == null" class="bg-peachPink-500 hover:bg-peachPink-800 text-white p-2 rounded mt-2">Text jetzt schreiben</button>
+    <Button variant="primary" type="submit" :disabled="selectedWritingStyle == null">Text jetzt schreiben</button>
   </form>
 </template>
 

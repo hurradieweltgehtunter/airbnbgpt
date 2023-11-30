@@ -156,6 +156,7 @@ class Agent extends Model
     {
         $existingAgent = $entity->agents()->where('name', $agentName)->first();
         if($existingAgent) {
+            $existingAgent = AgentFactory::load($existingAgent->id);
             $existingAgent->initRuntime();
             return $existingAgent;
         }
@@ -224,8 +225,11 @@ class Agent extends Model
         ];
 
         if($this->use_functions == true) {
-            $params['functions'] = $this->functions;
-            $params['function_call'] = $this->functionCall;
+            // $params['functions'] = $this->functions;
+            // $params['function_call'] = $this->functionCall;
+
+            $params['tools'] = $this->tools;
+            $params['tool_choice'] = $this->tool_choice;
         }
 
         try {

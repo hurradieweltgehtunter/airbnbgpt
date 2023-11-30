@@ -30,8 +30,6 @@
       switch (props.section) {
         case 'create':
           return defineAsyncComponent(() => import('@/Components/WritingStyle/Create.vue'))
-        case 'edit':
-          return defineAsyncComponent(() => import('@/Components/WritingStyle/Edit.vue'))
         case 'show':
           return defineAsyncComponent(() => import('@/Components/WritingStyle/Show.vue'))
         default:

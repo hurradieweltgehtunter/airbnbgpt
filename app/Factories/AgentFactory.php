@@ -10,6 +10,7 @@ use App\Agents\WriterAgent;
 use App\Agents\WriterAllinOneAgent;
 use App\Agents\ImageDescriptionAgent;
 use App\Agents\TestAgent;
+use App\Agents\AirbnbScraperAgent;
 
 use App\Services\AgentService;
 
@@ -52,6 +53,10 @@ class AgentFactory
                 $newAgent = TestAgent::find($agent->id);
                 break;
 
+            case 'AirbnbScraperAgent':
+                $newAgent = AirbnbScraperAgent::find($agent->id);
+                break;
+
             default:
                 throw new ModelNotFoundException('Agent type not found in Factory: ' . $agent->name);
         }
@@ -60,6 +65,8 @@ class AgentFactory
     }
 
     public static function createNew($agentName, $entity, $data = []) {
+
+
         $agentService = new AgentService();
         $availableAgent = $agentService->getAgentByName($agentName);
 
@@ -97,6 +104,10 @@ class AgentFactory
 
             case 'TestAgent':
                 $newAgent = new TestAgent($availableAgent->toArray());
+                break;
+
+            case 'AirbnbScraperAgent':
+                $newAgent = new AirbnbScraperAgent($availableAgent->toArray());
                 break;
 
             default:

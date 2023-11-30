@@ -95,7 +95,7 @@ export default class Housing {
   async deleteImage(image) {
     try {
 
-      const response = await axios.delete(`/api/housings/${this.data.id}/images/${image.data.id}`);
+      const response = await axios.delete(route('housingimages.destroy', image.data.id));
 
       // Remove image from images array
       const index = this.images.value.indexOf(image);
