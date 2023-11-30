@@ -508,5 +508,42 @@ Schreibe die Texte SEO-optimiert: Integriere relevante Schlüsselwörter, die po
 Schreibstil: Beachte grundsätzlich korrekte deutsche Grammatik und Rechtschreibung. Folgende Angaben zum Schreibstil sind aber wichtiger und müssen unbedingt beachtet werden: {{writingStyle}}'])
             ]
         ]);
+
+        DB::table('available_agents')->insert([
+            [
+                'name'              => 'AirbnbScraperAgent',
+                'description'       => 'Ein Agent, der den Fotorundgang eines Airbnb inserats analysiert und die Bilder gruppiert nach Zimmer ausgibt.',
+                'system_prompt'     => '',
+                'use_functions'     => true,
+                'initial_message'   => json_encode(['role' => 'user', 'content' => 'Extrahiere aus folgendem HTML-Code die Bilder und gruppiere sie nach Zimmern.']),
+                'model'             => 'gpt-4-1106-preview',
+                'fake_enabled'      => true,
+                'fake_responses'    => json_encode([
+                    'gpt-4-1106-preview' => [
+                        'choices' => [
+                            [
+                                'index' => 0,
+                                'message' => [
+                                    'role' => 'assistant',
+                                    'content' => '',
+                                    'tool_calls' => [
+                                        [
+                                            'id' => 'call_PLcA3LFKV5ZxnXXA5lnojsrj',
+                                            'type' => 'function',
+                                            'function' => [
+                                                    'name' => 'image_extractor',
+                                                    'arguments' => '{"rooms":[{"name":"Wohnbereich","images":["https://a0.muscache.com/im/pictures/miso/Hosting-1022870940231653444/original/cd6e542c-4f92-4c67-8e0e-e404350a9eff.jpeg","https://a0.muscache.com/im/pictures/miso/Hosting-1022870940231653444/original/5c818c3e-c33f-4957-8791-125116483078.jpeg","https://a0.muscache.com/im/pictures/miso/Hosting-1022870940231653444/original/1966a7c1-cb07-4f8e-a17a-102aed38e575.jpeg"]},{"name":"Voll ausgestattete Küche","images":["https://a0.muscache.com/im/pictures/miso/Hosting-1022870940231653444/original/de467013-2bd2-44a5-b426-8b604e46ee8b.jpeg","https://a0.muscache.com/im/pictures/miso/Hosting-1022870940231653444/original/e4cdabff-476f-4e74-99b8-29bb0079c9cc.jpeg","https://a0.muscache.com/im/pictures/miso/Hosting-1022870940231653444/original/3bd985db-0267-4058-b424-3f5581cee8bb.jpeg","https://a0.muscache.com/im/pictures/miso/Hosting-1022870940231653444/original/13891dbc-6162-416b-846c-33924e8caf29.jpeg","https://a0.muscache.com/im/pictures/miso/Hosting-1022870940231653444/original/670e40e7-c298-43c8-99a3-c5ec25313b2d.jpeg"]},{"name":"Badezimmer","images":["https://a0.muscache.com/im/pictures/miso/Hosting-1022870940231653444/original/5f6b9ec3-1e41-4157-ad24-080974c9a70c.jpeg"]},{"name":"Schlafbereich","images":["https://a0.muscache.com/im/pictures/miso/Hosting-1022870940231653444/original/1ab819db-a690-4eb0-98f7-dff1e9128da8.jpeg"]}]}'
+                                            ]
+                                        ]
+
+                                    ],
+                                    'function_call' => null
+                                ]
+                            ],
+                        ]
+                    ]
+                ])
+            ]
+        ]);
     }
 }

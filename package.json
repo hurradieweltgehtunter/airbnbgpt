@@ -30,6 +30,7 @@
         "eventemitter3": "^5.0.1",
         "flowbite": "^2.0.0",
         "pinia": "^2.1.7",
+        "puppeteer": "^21.5.2",
         "vue-advanced-chat": "^2.0.7",
         "vue-axios": "^3.5.2",
         "vue3-google-map": "^0.18.0"
