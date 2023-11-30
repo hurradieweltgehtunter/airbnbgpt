@@ -35,14 +35,14 @@ class WriterAgent extends Agent
         echo 'WriterAgent: ' . $this->id . "\n";
             exit();
 
-        $this->functionCall = ['name' => 'handle_texts'];
-
         $response = parent::run();
 
-        if(isset($response->functionCall)) {
-            $functionName = $response->functionCall->name;
+        if(isset($response->toolCalls)) {
+            $arguments = json_decode($response->toolCalls[0]->function->arguments);
 
-            $result = $this->$functionName($response);
+            $functionName = $response->toolCalls[0]->function->name;
+
+            $result = $this->$functionName($arguments);
         } else {
             throw new \Exception("No function call received in Writer Agent");
         }
@@ -57,8 +57,7 @@ class WriterAgent extends Agent
     /**
      * Method to handle the functionCall response from AI
      */
-    private function handle_texts($response) {
-        $arguments = json_decode($response->functionCall->arguments);
+    private function handle_texts($arguments) {
         $contents = array();
         $housing = $this->agentable;
 

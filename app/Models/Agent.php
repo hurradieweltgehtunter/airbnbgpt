@@ -33,9 +33,9 @@ class Agent extends Model
     // Properties, which will be taken from available Agent on runtime (initRuntime())
     public $system_prompt;
     public $model;
-    public $functions;
-    public $functionCall;
-    public $use_functions;
+    public $tools;
+    public $tool_choice;
+    public $use_tools;
     public $fake_responses;
     public $fake_enabled;
 
@@ -110,10 +110,12 @@ class Agent extends Model
         // Load some config params from available_agents
         $agentService = new AgentService();
         $availableAgent = $agentService->getAgentByName($this->name);
+
         $this->system_prompt = $availableAgent->system_prompt;
         $this->model = $availableAgent->model;
-        $this->functions = $availableAgent->functions;
-        $this->use_functions = $availableAgent->use_functions;
+        $this->tools = $availableAgent->tools;
+        $this->use_tools = $availableAgent->use_tools;
+        $this->tool_choice = $availableAgent->tool_choice ? ["type" => "function", "function" => ["name" => $availableAgent->tool_choice]] : 'none';
         $this->fake_responses = $availableAgent->fake_responses;
         $this->fake_enabled = $availableAgent->fake_enabled;
 
@@ -121,13 +123,6 @@ class Agent extends Model
         $this->conversation = new Conversation();
 
         // Get the initial message from available_agents
-        $agentService = new AgentService();
-        $availableAgent = $agentService->getAgentByName($this->name);
-
-        if (!$availableAgent) {
-            throw new Exception("Agent not found.");
-        }
-
         if (isset($availableAgent->initial_message)) {
             $message = $this->addMessage($availableAgent->initial_message);
         } else {
@@ -152,19 +147,24 @@ class Agent extends Model
      * @param $agentName Name of the agent to create
      * @param $entity Entity to which the agent belongs (Housing, WritingStyle, ...)
      */
-    public static function createFromName($agentName, $entity, $parameters = [])
+    public static function createFromName($agentName, $entity = null, $parameters = [])
     {
-        $existingAgent = $entity->agents()->where('name', $agentName)->first();
-        if($existingAgent) {
-            $existingAgent = AgentFactory::load($existingAgent->id);
-            $existingAgent->initRuntime();
-            return $existingAgent;
+        if ($entity) {
+            $existingAgent = $entity->agents()->where('name', $agentName)->first();
+            if($existingAgent) {
+                $existingAgent = AgentFactory::load($existingAgent->id);
+                $existingAgent->initRuntime();
+                return $existingAgent;
+            }
+
+            $agent = AgentFactory::createNew($agentName, $entity);
+            $agent->parameters = $parameters;
+
+            $agent = $entity->agents()->save($agent);
+        } else {
+            $agent = AgentFactory::createNew($agentName, $entity);
+            $agent->parameters = $parameters;
         }
-
-        $agent = AgentFactory::createNew($agentName, $entity);
-        $agent->parameters = $parameters;
-
-        $agent = $entity->agents()->save($agent);
 
         // Check if init() exists on $agent
         if (method_exists($agent, 'init'))
@@ -172,7 +172,10 @@ class Agent extends Model
             $agent->init();
         }
 
-        $agent->refresh();
+        if ($entity) {
+            $agent->refresh();
+        }
+
         $agent->initRuntime();
 
         return $agent;
@@ -224,10 +227,7 @@ class Agent extends Model
             'max_tokens' => 1000
         ];
 
-        if($this->use_functions == true) {
-            // $params['functions'] = $this->functions;
-            // $params['function_call'] = $this->functionCall;
-
+        if($this->use_tools == true) {
             $params['tools'] = $this->tools;
             $params['tool_choice'] = $this->tool_choice;
         }
@@ -272,8 +272,8 @@ class Agent extends Model
                 'content'   => $message->content
             ];
 
-            if($message->role === 'function') {
-                $GPTMessage['name'] = $message->name;
+            if($message->role === 'tool') {
+                $GPTMessage['tool_call_id'] = $message->name; // ToDo: Set the message id thhis message is the answer to: https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages
             }
 
             $messages[] = $GPTmessage;

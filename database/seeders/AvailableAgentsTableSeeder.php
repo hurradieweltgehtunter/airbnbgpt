@@ -12,7 +12,7 @@ class AvailableAgentsTableSeeder extends Seeder
         DB::table('available_agents')->insert([
             [
                 'name'              => 'TestAgent',
-                'use_functions'     => false,
+                'use_tools'         => false,
                 'model'             => 'gpt-3.5-turbo',
                 'description'       => 'Test',
                 'system_prompt'     => 'Verhalte und antworte wie William Shakespeare. Verfasse deine Antworten in Alt-Deutsch.',
@@ -37,7 +37,7 @@ class AvailableAgentsTableSeeder extends Seeder
         DB::table('available_agents')->insert([
             [
                 'name'              => 'ActionSelectorAgent',
-                'use_functions'     => false,
+                'use_tools'         => false,
                 'model'             => 'gpt-3.5-turbo',
                 'description'       => 'Ein Agent, der eine Usermessage analysiert und ermittelt welche Funktion benutzt werden soll.',
                 'fake_enabled'      => true,
@@ -49,13 +49,19 @@ class AvailableAgentsTableSeeder extends Seeder
                                 'message' => [
                                     'role' => 'assistant',
                                     'content' => null,
-                                    'tool_calls' => [],
-                                    'function_call' => [
-                                        'name' => 'select_action',
-                                        'arguments' => [
-                                            'action' => 'default_handler'
+                                    'toolCalls' => [
+                                        [
+                                            'id' => 'asasdasdjiofhu43677',
+                                            'type' => 'function',
+                                            'function' => [
+                                                'name' => 'select_action',
+                                                'arguments' => [
+                                                    'action' => 'default_handler'
+                                                ]
+                                            ]
                                         ]
                                     ],
+                                    'function_call' => null
                                 ]
                             ],
                         ]
@@ -65,22 +71,25 @@ class AvailableAgentsTableSeeder extends Seeder
                                             These are the available actions:
                                             - default_handler: Use this, if no other action is suitable, params is the input',
                 'initial_message'   => json_encode(['role' => 'user', 'content' => 'Du siehst Bilder meiner Unterkunft. Der Teil meiner Unterkunft, der auf den Bildern zu sehen ist: {{label}}. Erstelle eine genaue Beschreibung der Einrichtung. Halte dich kurz und stichwortartig. Diese Beschreibung soll später dazu dienen, ansprechende Texte für AirBnB zu erstellen. maximal 600 Zeichen']),
-                'functions'         => json_encode([
+                'tools'         => json_encode([
                     [
-                        'name' => 'select_action',
-                        'description' => 'Selects the next action.',
-                        'parameters' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'action' => [
-                                    'type' => 'string',
-                                    'enum' => ['default_handler'],
-                                    'description' => 'Action name to accomplish a task',
+                        'type' => 'function',
+                        'function' => [
+                            'name' => 'select_action',
+                            'description' => 'Selects the next action.',
+                            'parameters' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'action' => [
+                                        'type' => 'string',
+                                        'enum' => ['default_handler'],
+                                        'description' => 'Action name to accomplish a task',
+                                    ],
                                 ],
+                                'required' => ['action'],
                             ],
-                            'required' => ['action'],
-                        ],
-                    ],
+                        ]
+                    ]
                 ])
             ],
         ]);
@@ -90,7 +99,7 @@ class AvailableAgentsTableSeeder extends Seeder
                 'name'              => 'ImageAnalyzerAgent',
                 'description'       => 'Ein Agent, der Bilder analysieren kann. Erstellt Beschreibungen, die als Grundlage für die Erstellung von Texten dienen können.',
                 'system_prompt'     => 'Beschreibe die Bilder. Verzichte auf Hinweise, Warnungen etc., Verzichte auf Formtierungen wie Zeilenumbrüche.',
-                'use_functions'     => false,
+                'use_tools'         => false,
                 'initial_message'   => json_encode(['role' => 'user', 'content' => 'Du siehst Bilder meiner Unterkunft. Der Teil meiner Unterkunft, der auf den Bildern zu sehen ist: {{label}}. Erstelle eine genaue Beschreibung der Einrichtung. Halte dich kurz und stichwortartig. Diese Beschreibung soll später dazu dienen, ansprechende Texte für AirBnB zu erstellen. maximal 600 Zeichen']),
                 'model'             => 'gpt-4-vision-preview',
                 'fake_enabled'      => true,
@@ -115,7 +124,7 @@ class AvailableAgentsTableSeeder extends Seeder
                 'name'              => 'ImageDescriptionAgent',
                 'description'       => 'Ein Agent, der Bilder analysieren kann. Erstellt Beschreibungen, die als Grundlage für die Erstellung von Texten dienen können.',
                 'system_prompt'     => 'Beschreibe die Bilder. Verzichte auf Hinweise, Warnungen etc., Verzichte auf Formtierungen wie Zeilenumbrüche.',
-                'use_functions'     => false,
+                'use_tools'         => false,
                 'initial_message'   => json_encode(['role' => 'user', 'content' => 'Du siehst Bilder meiner Unterkunft. Der Teil meiner Unterkunft, der auf den Bildern zu sehen ist: {{label}}. Erstelle eine 250 Zeichen lange Bildbeschreibung. Es soll potenziellen Gästen einen Eindruck davon vermitteln, wie es ist, in meiner Unterkunft zu wohnen.']),
                 'model'             => 'gpt-4-vision-preview',
                 'fake_enabled'      => true,
@@ -140,7 +149,8 @@ class AvailableAgentsTableSeeder extends Seeder
                 'name'              => 'HousingQuestionnaireAgent',
                 'description'       => 'Ein Agent, der Informationen über eine Unterkunft sammelt und diese Informationen in Texte umwandeln kann.',
                 'model'             => 'gpt-4-1106-preview',
-                'use_functions'     => true,
+                'use_tools'         => true,
+                'tool_choice'       => 'default_handler',
                 'fake_enabled'      => true,
                 'fake_responses'    => json_encode([
                     'gpt-4-1106-preview' => [
@@ -150,34 +160,42 @@ class AvailableAgentsTableSeeder extends Seeder
                                 'message' => [
                                     'role' => 'assistant',
                                     'content' => null,
-                                    'tool_calls' => [],
-                                    'function_call' => [
-                                        'name' => 'default_handler',
-                                        'arguments' => [
-                                            'q' => 'FAKE: Wie viele Zimmer hat die Unterkunft?',
-                                            'p' => [
-                                                'l' => 0,
-                                                's' => 0,
-                                                't' => 0,
-                                                'f' => 0,
-                                                'g' => 0,
-                                            ],
-                                            'o' => [
-                                                '1',
-                                                '2',
-                                                '3',
-                                                '4',
-                                                '5',
-                                                '6',
-                                                '7',
-                                                '8',
-                                                '9',
-                                                '10',
-                                            ],
-                                            'mo' => false,
-                                            'f' => true,
+                                    'toolCalls' => [
+                                        [
+                                            'id' => 'asasdasdjiofhu43677',
+                                            'type' => 'function',
+                                            'function' => [
+                                                [
+                                                    'name' => 'default_handler',
+                                                    'arguments' => [
+                                                        'q' => 'FAKE: Wie viele Zimmer hat die Unterkunft?',
+                                                        'p' => [
+                                                            'l' => 0,
+                                                            's' => 0,
+                                                            't' => 0,
+                                                            'f' => 0,
+                                                            'g' => 0,
+                                                        ],
+                                                        'o' => [
+                                                            '1',
+                                                            '2',
+                                                            '3',
+                                                            '4',
+                                                            '5',
+                                                            '6',
+                                                            '7',
+                                                            '8',
+                                                            '9',
+                                                            '10',
+                                                        ],
+                                                        'mo' => false,
+                                                        'f' => true,
+                                                    ]
+                                                ],
+                                            ]
                                         ]
                                     ],
+                                    'function_call' => null
                                 ]
                             ],
                         ]
@@ -226,63 +244,66 @@ class AvailableAgentsTableSeeder extends Seeder
                         Wenn du der Meinung bist, alle Informationen erhalten zu haben um die Texte zu erstellen, antworte nur mit "READY".'
                 ]),
 
-                'functions'         => json_encode([
+                'tools' => json_encode([
                     [
-                        'name' => 'default_handler',
-                        'description' => 'Default function to continue the conversation',
-                        'parameters' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'q' => [ // question
-                                    'type' => 'string',
-                                    'description' => 'Your answer and the next question',
-                                ],
-                                'p' => [// progress
-                                    'type' => 'object',
-                                    'description' => 'An object of progress values (1-100) for the different topics',
-                                    'properties' => [
-                                        'l' => [ // location
-                                            'type' => 'number',
-                                            'description' => 'An estimated progress in percent, how far you are with the information about the location of the accomodation (integer)',
-                                        ],
-                                        's' => [ // surrounding
-                                            'type' => 'number',
-                                            'description' => 'An estimated progress in percent, how far you are with the information about the sourroundings of the accomodation (integer)',
-                                        ],
-                                        't' => [ // type
-                                            'type' => 'number',
-                                            'description' => 'An estimated progress in percent, how far you are with the type of the accomodation information (integer)',
-                                        ],
-                                        'f' => [ // furnishing
-                                            'type' => 'number',
-                                            'description' => 'An estimated progress in percent, how far you are how the accomodation and the leased area is furnished (integer)',
-                                        ],
-                                        'g' => [ // guest_expectations
-                                            'type' => 'number',
-                                            'description' => 'An estimated progress in percent, how far you are about what the guests can except from the accomodation (integer)',
-                                        ]
-                                    ],
-                                ],
-                                'o' => [ // options
-                                    'type' => 'array',
-                                    'description' => 'An array of options I can choose from to answer your question. If your question is not a multiple choice question, return an empty array.',
-                                    'items' => [
+                        'type' => 'function',
+                        'function' => [
+                            'name' => 'default_handler',
+                            'description' => 'Default function to continue the conversation',
+                            'parameters' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'q' => [ // question
                                         'type' => 'string',
+                                        'description' => 'Your answer and the next question',
                                     ],
-                                ],
-                                'mo' => [ // multiple options
-                                    'type' => 'boolean',
-                                    'description' => 'If multiple options are can be selected, this is true. If not, this is false.',
-                                ],
-                                'f' => [ // hasFreetext
-                                    'type' => 'boolean',
-                                    'description' => 'If your question is a multiple choice question, this is false. If your question is a free text question, this is true.',
-                                ],
+                                    'p' => [// progress
+                                        'type' => 'object',
+                                        'description' => 'An object of progress values (1-100) for the different topics',
+                                        'properties' => [
+                                            'l' => [ // location
+                                                'type' => 'number',
+                                                'description' => 'An estimated progress in percent, how far you are with the information about the location of the accomodation (integer)',
+                                            ],
+                                            's' => [ // surrounding
+                                                'type' => 'number',
+                                                'description' => 'An estimated progress in percent, how far you are with the information about the sourroundings of the accomodation (integer)',
+                                            ],
+                                            't' => [ // type
+                                                'type' => 'number',
+                                                'description' => 'An estimated progress in percent, how far you are with the type of the accomodation information (integer)',
+                                            ],
+                                            'f' => [ // furnishing
+                                                'type' => 'number',
+                                                'description' => 'An estimated progress in percent, how far you are how the accomodation and the leased area is furnished (integer)',
+                                            ],
+                                            'g' => [ // guest_expectations
+                                                'type' => 'number',
+                                                'description' => 'An estimated progress in percent, how far you are about what the guests can except from the accomodation (integer)',
+                                            ]
+                                        ],
+                                    ],
+                                    'o' => [ // options
+                                        'type' => 'array',
+                                        'description' => 'An array of options I can choose from to answer your question. If your question is not a multiple choice question, return an empty array.',
+                                        'items' => [
+                                            'type' => 'string',
+                                        ],
+                                    ],
+                                    'mo' => [ // multiple options
+                                        'type' => 'boolean',
+                                        'description' => 'If multiple options are can be selected, this is true. If not, this is false.',
+                                    ],
+                                    'f' => [ // hasFreetext
+                                        'type' => 'boolean',
+                                        'description' => 'If your question is a multiple choice question, this is false. If your question is a free text question, this is true.',
+                                    ],
 
+                                ],
+                                'required' => ['q', 'p', 'o', 'f', 'mo'],
                             ],
-                            'required' => ['q', 'p', 'o', 'f', 'mo'],
-                        ],
-                    ],
+                        ]
+                    ]
                 ]),
             ],
         ]);
@@ -293,7 +314,8 @@ class AvailableAgentsTableSeeder extends Seeder
                 'description'       => 'Ein Agent, der Beispieltexte analysiert und eine Vorlage gibt, Texte im gleichen Stil zu schreiben',
                 'model'             => 'gpt-4',
                 'system_prompt'     => 'Du bist ein Sprachgenie und analysierst Texte. nichts anderes.',
-                'use_functions'     => true,
+                'use_tools'         => true,
+                'tool_choice'       => 'analysis_handler',
                 'fake_enabled'      => true,
                 'fake_responses'    => json_encode([
                     'gpt-4' => [
@@ -303,43 +325,51 @@ class AvailableAgentsTableSeeder extends Seeder
                                 'message' => [
                                     'role' => 'assistant',
                                     'content' => null,
-                                    'tool_calls' => [],
-                                    'function_call' => [
-                                        'name' => 'analysis_handler',
-                                        'arguments' => [
-                                            'description' => 'Die detaillierten Anweisungen zum Schreiben zukünftiger Texte.',
-                                            'title' => 'Ein kurzer, prägnanter Title für den analysierten Schreibstil',
+                                    'tool_calls' => [
+                                        [
+                                            'id' => '273zfihubasc',
+                                            'type' => 'function',
+                                            'function' => [
+                                                'name' => 'analysis_handler',
+                                                'arguments' => json_encode([
+                                                    'description' => 'Die detaillierten Anweisungen zum Schreiben zukünftiger Texte.',
+                                                    'title' => 'Ein kurzer, prägnanter Title für den analysierten Schreibstil',
+                                                ])
+                                            ]
                                         ]
                                     ],
+                                    'function_call' => null
                                 ]
                             ],
                         ]
                     ]
                 ]),
-                'functions'         => json_encode([
+                'tools'         => json_encode([
                     [
-                        'name' => 'analysis_handler',
-                        'description' => 'Benutze diese Funktion, damit ich deine Antwort weiter bearbeiten kann.',
-                        'parameters' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'description' => [
-                                    'type' => 'string',
-                                    'description' => 'Die detaillierten Anweisungen zum Schreiben zukünftiger Texte.',
+                        'type'  => 'function',
+                        'function' => [
+                            'name' => 'analysis_handler',
+                            'description' => 'Benutze diese Funktion, damit ich deine Antwort weiter bearbeiten kann.',
+                            'parameters' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'description' => [
+                                        'type' => 'string',
+                                        'description' => 'Die detaillierten Anweisungen zum Schreiben zukünftiger Texte.',
+                                    ],
+                                    'title' => [
+                                        'type' => 'string',
+                                        'description' => 'Ein kurzer, prägnanter Title für den analysierten Schreibstil',
+                                    ],
                                 ],
-                                'title' => [
-                                    'type' => 'string',
-                                    'description' => 'Ein kurzer, prägnanter Title für den analysierten Schreibstil',
-                                ],
+                                'required' => ['description', 'title'],
                             ],
-                            'required' => ['description', 'title'],
-                        ],
+                        ]
                     ],
                 ]),
-                'initial_message'   => json_encode(['role' => 'user', 'content' => 'KI, hier sind mehrere Beispieltexte, die meinen bevorzugten Schreibstil repräsentieren. Bitte analysiere diese Texte hinsichtlich folgender Aspekte: Tonalität (formell, informell), Sprachstil (direkt, beschreibend, narrativ), Satzstruktur (einfach, komplex), Wortschatz (Fachjargon, alltagssprachlich), und thematische Schwerpunkte.
-                                        Basierend auf dieser Analyse, erstelle bitte eine detaillierte Anweisung für die Erstellung zukünftiger Texte, die diesen Stil genau nachahmt. Die Anweisung sollte spezifische Richtlinien zu Sprachgebrauch, Tonalität, Struktur und Themenauswahl enthalten, um sicherzustellen, dass die zukünftigen Texte kohärent mit den vorgegebenen Beispielen sind.
-                                        Formuliere deine Antwort als Anweisung.
-                                        '])
+                'initial_message'   => json_encode(['role' => 'user', 'content' => 'Ich gebe dir hier einen Beispieltext, der meinen bevorzugten Schreibstil repräsentiert. Erstelle eine detaillierte Anweisung für die Erstellung zukünftiger Texte, die diesen Stil genau nachahmt. Die Anweisung sollte spezifische Richtlinien zu Sprachgebrauch, Tonalität, Satzstruktur, Struktur, Wortschatz, thematische Schwerpunkten und weiteren wichtigen Aspekten enthalten.
+Formuliere deine Antwort unbedingt als Anweisung, die ich einem Texter geben kann. Beginne mit "Schreibstil:". Hier der Beispieltext:
+{{exampleText}}'])
             ]
         ]);
 
@@ -349,7 +379,8 @@ class AvailableAgentsTableSeeder extends Seeder
                 'description'       => 'Ein Agent, der die Texte schreibt',
                 'model'             => 'gpt-4',
                 'system_prompt'     => 'Du bist sehr gut im formulieren von deutschen Texten. Du achtest sehr genau auf korrekte deutsche Grammatik und Rechtschreibung.',
-                'use_functions'     => true,
+                'use_tools'         => true,
+                'tool_choice'       => 'handle_texts',
                 'fake_enabled'      => true,
                 'fake_responses'    => json_encode([
                     'gpt-4' => [
@@ -359,52 +390,61 @@ class AvailableAgentsTableSeeder extends Seeder
                                 'message' => [
                                     'role' => 'assistant',
                                     'content' => null,
-                                    'tool_calls' => [],
-                                    'function_call' => [
-                                        'name' => 'handle_texts',
-                                        'arguments' => [
-                                            'title' => 'Ein SEO-optimierter, prägnanter Titel für das Inserat. (max. 50 Zeichen)',
-                                            'description' => 'Vermittle meinen Gästen ein Gefühl dafür, wie es ist, in meiner Unterkunft zu wohnen. Nenne die Gründe, warum sie ihren Aufenthalt dort genießen werden (max. 500 Zeichen)',
-                                            'accomodation' => 'Beschreibe, wie die Unterkunft und die Zimmer aussehen, damit Gäste wissen, womit sie rechnen können.',
-                                            'guest_accessibility' => 'Informiere meine Gäste darüber, zu welchen Bereichen innerhalb der Unterkunft sie Zugang haben werden.',
-                                            'more' => 'Nenne alle Besonderheiten, die du potenziellen Gästen vor der Buchung mitteilen möchtest und die in den anderen Abschnitten nicht erwähnt werden.',
+                                    'tool_calls' => [
+                                        [
+                                            'id' => '273zfihubasc',
+                                            'type' => 'function',
+                                            'function' => [
+                                                'name' => 'handle_texts',
+                                                'arguments' => [
+                                                    'title' => 'Ein SEO-optimierter, prägnanter Titel für das Inserat. (max. 50 Zeichen)',
+                                                    'description' => 'Vermittle meinen Gästen ein Gefühl dafür, wie es ist, in meiner Unterkunft zu wohnen. Nenne die Gründe, warum sie ihren Aufenthalt dort genießen werden (max. 500 Zeichen)',
+                                                    'accomodation' => 'Beschreibe, wie die Unterkunft und die Zimmer aussehen, damit Gäste wissen, womit sie rechnen können.',
+                                                    'guest_accessibility' => 'Informiere meine Gäste darüber, zu welchen Bereichen innerhalb der Unterkunft sie Zugang haben werden.',
+                                                    'more' => 'Nenne alle Besonderheiten, die du potenziellen Gästen vor der Buchung mitteilen möchtest und die in den anderen Abschnitten nicht erwähnt werden.',
+                                                ]
+                                            ]
                                         ]
                                     ],
+                                    'function_call' => null
                                 ]
                             ],
                         ]
                     ]
                 ]),
-                'functions'         => json_encode([
+                'tools'         => json_encode([
                     [
-                        'name' => 'handle_texts',
-                        'description' => 'Schreibe die erforderlichen Texte für das Angebot. Verwende diese Funktion, wenn du alle Informationen erhalten hast, die du zum Schreiben der Texte benötigst. Wenn nicht, verwende die Funktion default_handler.',
-                        'parameters' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'title' => [
-                                    'type' => 'string',
-                                    'description' => 'Ein SEO-optimierter, prägnanter Titel für das Inserat. (max. 50 Zeichen)',
+                        'type' => 'function',
+                        'function' => [
+                            'name' => 'handle_texts',
+                            'description' => 'Schreibe die erforderlichen Texte für das Angebot. Verwende diese Funktion, wenn du alle Informationen erhalten hast, die du zum Schreiben der Texte benötigst. Wenn nicht, verwende die Funktion default_handler.',
+                            'parameters' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'title' => [
+                                        'type' => 'string',
+                                        'description' => 'Ein SEO-optimierter, prägnanter Titel für das Inserat. (max. 50 Zeichen)',
+                                    ],
+                                    'description' => [
+                                        'type' => 'string',
+                                        'description' => 'Vermittle meinen Gästen ein Gefühl dafür, wie es ist, in meiner Unterkunft zu wohnen. Nenne die Gründe, warum sie ihren Aufenthalt dort genießen werden (max. 500 Zeichen)',
+                                    ],
+                                    'accomodation' => [
+                                        'type' => 'string',
+                                        'description' => 'Beschreibe, wie die Unterkunft und die Zimmer aussehen, damit Gäste wissen, womit sie rechnen können.',
+                                    ],
+                                    'guest_accessibility' => [
+                                        'type' => 'string',
+                                        'description' => 'Informiere meine Gäste darüber, zu welchen Bereichen innerhalb der Unterkunft sie Zugang haben werden.',
+                                    ],
+                                    'more' => [
+                                        'type' => 'string',
+                                        'description' => 'Nenne alle Besonderheiten, die du potenziellen Gästen vor der Buchung mitteilen möchtest und die in den anderen Abschnitten nicht erwähnt werden.',
+                                    ],
                                 ],
-                                'description' => [
-                                    'type' => 'string',
-                                    'description' => 'Vermittle meinen Gästen ein Gefühl dafür, wie es ist, in meiner Unterkunft zu wohnen. Nenne die Gründe, warum sie ihren Aufenthalt dort genießen werden (max. 500 Zeichen)',
-                                ],
-                                'accomodation' => [
-                                    'type' => 'string',
-                                    'description' => 'Beschreibe, wie die Unterkunft und die Zimmer aussehen, damit Gäste wissen, womit sie rechnen können.',
-                                ],
-                                'guest_accessibility' => [
-                                    'type' => 'string',
-                                    'description' => 'Informiere meine Gäste darüber, zu welchen Bereichen innerhalb der Unterkunft sie Zugang haben werden.',
-                                ],
-                                'more' => [
-                                    'type' => 'string',
-                                    'description' => 'Nenne alle Besonderheiten, die du potenziellen Gästen vor der Buchung mitteilen möchtest und die in den anderen Abschnitten nicht erwähnt werden.',
-                                ],
+                                'required' => ['description', 'accomodation', 'guest_accessibility', 'more'],
                             ],
-                            'required' => ['description', 'accomodation', 'guest_accessibility', 'more'],
-                        ],
+                        ]
                     ],
                 ]),
                 'initial_message'   => json_encode(['role' => 'user', 'content' => 'Erstelle folgende Texte für mein AirBnB-Inserat:
@@ -427,7 +467,8 @@ class AvailableAgentsTableSeeder extends Seeder
                 'description'       => 'Ein Agent, der die Texte schreibt',
                 'model'             => 'gpt-4-vision-preview',
                 'system_prompt'     => 'Du bist Experte im Formulieren von deutschen, ansprechenden Texten. Achte sehr genau auf korrekte deutsche Grammatik und Rechtschreibung.',
-                'use_functions'     => true,
+                'use_tools'         => true,
+                'tool_choice'       => 'handle_texts',
                 'fake_enabled'      => true,
                 'fake_responses'    => json_encode(
                     [
@@ -438,54 +479,63 @@ class AvailableAgentsTableSeeder extends Seeder
                                     'message' => [
                                         'role' => 'assistant',
                                         'content' => '',
-                                        'tool_calls' => [],
-                                        'function_call' => [
-                                            'name' => 'handle_texts',
-                                            'arguments' => [
-                                                'title' => 'Ein SEO-optimierter, prägnanter Titel für das Inserat. (max. 50 Zeichen)',
-                                                'description' => 'Vermittle meinen Gästen ein Gefühl dafür, wie es ist, in meiner Unterkunft zu wohnen. Nenne die Gründe, warum sie ihren Aufenthalt dort genießen werden (max. 500 Zeichen)',
-                                                'accomodation' => 'Beschreibe, wie die Unterkunft und die Zimmer aussehen, damit Gäste wissen, womit sie rechnen können.',
-                                                'guest_accessibility' => 'Informiere meine Gäste darüber, zu welchen Bereichen innerhalb der Unterkunft sie Zugang haben werden.',
-                                                'more' => 'Nenne alle Besonderheiten, die du potenziellen Gästen vor der Buchung mitteilen möchtest und die in den anderen Abschnitten nicht erwähnt werden.',
+                                        'tool_calls' => [
+                                            [
+                                                'id' => '273zfihubasc',
+                                                'type' => 'function',
+                                                'function' => [
+                                                    'name' => 'handle_texts',
+                                                    'arguments' => [
+                                                        'title' => 'Ein SEO-optimierter, prägnanter Titel für das Inserat. (max. 50 Zeichen)',
+                                                        'description' => 'Vermittle meinen Gästen ein Gefühl dafür, wie es ist, in meiner Unterkunft zu wohnen. Nenne die Gründe, warum sie ihren Aufenthalt dort genießen werden (max. 500 Zeichen)',
+                                                        'accomodation' => 'Beschreibe, wie die Unterkunft und die Zimmer aussehen, damit Gäste wissen, womit sie rechnen können.',
+                                                        'guest_accessibility' => 'Informiere meine Gäste darüber, zu welchen Bereichen innerhalb der Unterkunft sie Zugang haben werden.',
+                                                        'more' => 'Nenne alle Besonderheiten, die du potenziellen Gästen vor der Buchung mitteilen möchtest und die in den anderen Abschnitten nicht erwähnt werden.',
+                                                    ]
+                                                ]
                                             ]
                                         ],
+                                        'function_call' => null
                                     ]
                                 ],
                             ]
                         ]
                     ]
                             ),
-                'functions'         => json_encode([
+                'tools'         => json_encode([
                     [
-                        'name' => 'handle_texts',
-                        'description' => 'Schreibe die erforderlichen Texte für das Angebot. Verwende diese Funktion, wenn du alle Informationen erhalten hast, die du zum Schreiben der Texte benötigst. Wenn nicht, verwende die Funktion default_handler.',
-                        'parameters' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'title' => [
-                                    'type' => 'string',
-                                    'description' => 'Der Titel des Inserats',
+                        'type' => 'function',
+                        'function' => [
+                            'name' => 'handle_texts',
+                            'description' => 'Schreibe die erforderlichen Texte für das Angebot. Verwende diese Funktion, wenn du alle Informationen erhalten hast, die du zum Schreiben der Texte benötigst. Wenn nicht, verwende die Funktion default_handler.',
+                            'parameters' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'title' => [
+                                        'type' => 'string',
+                                        'description' => 'Der Titel des Inserats',
+                                    ],
+                                    'description' => [
+                                        'type' => 'string',
+                                        'description' => 'Der Text "Inseratsbeschreibung"',
+                                    ],
+                                    'accomodation' => [
+                                        'type' => 'string',
+                                        'description' => 'Der Text "Die Unterkunft"',
+                                    ],
+                                    'guest_accessibility' => [
+                                        'type' => 'string',
+                                        'description' => 'Der Text "Gästezugang"',
+                                    ],
+                                    'more' => [
+                                        'type' => 'string',
+                                        'description' => 'Der Text "Weitere Angaben"',
+                                    ],
                                 ],
-                                'description' => [
-                                    'type' => 'string',
-                                    'description' => 'Der Text "Inseratsbeschreibung"',
-                                ],
-                                'accomodation' => [
-                                    'type' => 'string',
-                                    'description' => 'Der Text "Die Unterkunft"',
-                                ],
-                                'guest_accessibility' => [
-                                    'type' => 'string',
-                                    'description' => 'Der Text "Gästezugang"',
-                                ],
-                                'more' => [
-                                    'type' => 'string',
-                                    'description' => 'Der Text "Weitere Angaben"',
-                                ],
+                                'required' => ['title', 'description', 'accomodation', 'guest_accessibility', 'more'],
                             ],
-                            'required' => ['title', 'description', 'accomodation', 'guest_accessibility', 'more'],
                         ],
-                    ],
+                    ]
                 ]),
                 'initial_message'   => json_encode(['role' => 'user', 'content' => 'Basierend auf den bereitgestellten hochwertigen Bildern meiner Unterkunft, dem Dialog und den Beispieltexten, erstelle folgende Textabschnitte für mein AirBnB-Inserat:
 - Titel:

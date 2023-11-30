@@ -21,17 +21,18 @@ class TestAgent extends Agent
 
     public function run($data = null) {
 
-        $this->functionCall = ['name' => 'handle_texts'];
-
         $response = parent::run();
 
         echo '<pre>';
             print_r($response);
             echo '</pre>';
-        if(isset($response->functionCall)) {
-            $functionName = $response->functionCall->name;
+        if(isset($response->toolCalls)) {
+            $arguments = json_decode($response->toolCalls[0]->function->arguments);
 
-            $result = $this->$functionName($response);
+            $functionName = $response->toolCalls[0]->function->name;
+
+            $result = $this->$functionName($arguments);
+
         } else {
             echo '<pre>';
             print_r($response);
@@ -51,15 +52,14 @@ class TestAgent extends Agent
     /**
      * Method to handle the functionCall response from AI
      */
-    private function handle_texts($response) {
-        $arguments = json_decode($response->functionCall->arguments);
+    private function handle_texts($arguments) {
 
         echo '<pre>';
         print_r($arguments);
         echo '</pre>';
 
 
-        return $contents;
+        return '';
     }
 
     public function finished() {

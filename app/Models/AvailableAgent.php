@@ -15,16 +15,16 @@ class AvailableAgent extends Model
         'system_prompt',
         'initial_message',
         'model',
-        'use_functions',
-        'functions',
+        'use_tools',
+        'tools',
         'fake_responses',
         'fake_enabled'
     ];
 
     protected $casts = [
         'initial_message' => 'array',
-        'functions' => 'array',
-        'use_functions' => 'boolean',
+        'tools' => 'array',
+        'use_tools' => 'boolean',
         'fake_responses' => 'array',
         'fake_enabled' => 'boolean'
     ];

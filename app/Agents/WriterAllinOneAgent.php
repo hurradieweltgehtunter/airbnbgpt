@@ -71,17 +71,19 @@ class WriterAllinOneAgent extends Agent
         $this->prepareMessages();
 
         $this->functionCall = ['name' => 'handle_texts'];
-        $this->use_functions = false;
+        $this->use_tools = false;
 
         $response = parent::run();
 
         // save $response to text file in storage
         // Storage::put('AllinOneWriterResponse.txt', print_r($response, true));
 
-        if(isset($response->functionCall)) {
-            $functionName = $response->functionCall->name;
+        if(isset($response->toolCalls)) {
+            $arguments = json_decode($response->toolCalls[0]->function->arguments);
 
-            $result = $this->$functionName($response);
+            $functionName = $response->toolCalls[0]->function->name;
+
+            $result = $this->$functionName($arguments);
         } else {
             $housing = $this->agentable;
             $housingContent = $housing->contents()->updateOrCreate(
@@ -104,8 +106,7 @@ class WriterAllinOneAgent extends Agent
     /**
      * Method to handle the functionCall response from AI
      */
-    private function handle_texts($response) {
-        $arguments = json_decode($response->functionCall->arguments);
+    private function handle_texts($arguments) {
         $contents = array();
         $housing = $this->agentable;
 

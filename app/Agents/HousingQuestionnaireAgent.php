@@ -89,13 +89,12 @@ class HousingQuestionnaireAgent extends Agent
             return ['type' => 'message', 'message' => new MessageResource($lastMessage)];
         }
 
-        $this->functionCall = ['name' => 'default_handler'];
-
         $response = parent::run();
 
         // Handle the AI Response
-        if(isset($response->functionCall)) {
-            $functionName = $response->functionCall->name;
+        if(isset($response->toolCalls)) {
+            $arguments = json_decode($response->toolCalls[0]->function->arguments);
+            $functionName = $response->toolCalls[0]->function->name;
 
             $result = $this->$functionName($response);
         } else {
