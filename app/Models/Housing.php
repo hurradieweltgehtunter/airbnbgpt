@@ -8,6 +8,8 @@ use App\Factories\AgentFactory;
 
 class Housing extends Model
 {
+    public $is_finished = false;
+
     protected $fillable = [
         'belongs_to',
         'name',

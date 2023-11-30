@@ -34,7 +34,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
 
         <form @submit.prevent="submit">
             <div class="mt-4 flex items-center justify-between">
-                <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" :style="'primary'" type="submit">
+                <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" variant="primary" type="submit">
                     Bestätigungsemail erneut senden
                 </Button>
 

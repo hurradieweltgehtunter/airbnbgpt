@@ -31,9 +31,9 @@ class WritingStyleController extends Controller
         return Inertia::render('WritingStyle', ['section' => 'create']);
     }
 
-    public function createAgent(Request $request, WritingStyle $writingStyle)
+    public function createAgent(Request $request, WritingStyle $style)
     {
-        $agent = Agent::CreateFromName('WritingStyleAnalyzer', $writingStyle);
+        $agent = Agent::CreateFromName('WritingStyleAnalyzer', $style);
 
         // return AgentResource
         return new AgentResource($agent);
@@ -54,47 +54,48 @@ class WritingStyleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(WritingStyle $writingStyle)
+    public function show(Request $request, WritingStyle $style)
     {
-        return Inertia::render('WritingStyle', ['section' => 'show', 'writingStyle' => $writingStyle]);
+        return Inertia::render('WritingStyle', ['section' => 'show', 'writingStyle' => $style]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(WritingStyle $writingStyle)
+    public function edit(WritingStyle $style)
     {
-        //
+        // Currently not used. show() is used for both, showing and editing
+        return redirect()->route('styles.show', $style->id);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, WritingStyle $writingStyle)
+    public function update(Request $request, WritingStyle $style)
     {
         $data = $request->all();
 
-        $writingStyle->title = $data['title'];
-        $writingStyle->description = $data['description'];
+        $style->title = $data['title'];
+        $style->description = $data['description'];
 
-        $writingStyle->save();
-        $writingStyle->refresh();
+        $style->save();
+        $style->refresh();
 
-        return response()->json($writingStyle);
+        return response()->noContent();
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(WritingStyle $writingStyle)
+    public function destroy(WritingStyle $style)
     {
-        $writingStyle->delete();
+        $style->delete();
 
         return response()->json(null, 204);
 
     }
 
-    public function runAgent(WritingStyle $writingStyle, Agent $agent) {
+    public function runAgent(WritingStyle $style, Agent $agent) {
         $response = $agent->run();
 
         return response()->json($response);

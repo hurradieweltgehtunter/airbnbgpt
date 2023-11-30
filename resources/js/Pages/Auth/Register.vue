@@ -96,7 +96,7 @@ const submit = () => {
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <Button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing" :style="'primary'" type="submit">
+                <Button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing" variant="primary" type="submit">
                     Kostenlos registrieren
                 </Button>
             </div>

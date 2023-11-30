@@ -16,6 +16,7 @@ use App\Factories\AgentFactory;
 use App\Http\Resources\MessageResource;
 use App\Http\Resources\HousingResource;
 use App\Http\Resources\AgentResource;
+use App\Http\Resources\WritingStyleIndexResource;
 
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -33,13 +34,20 @@ class HousingController extends Controller
      */
     public function index()
     {
-        $housings = HousingResource::collection(auth()->user()->housings()->orderBy('id', 'desc')->get());
+        $housings = HousingIndexResource::collection(
+            auth()
+            ->user()
+            ->housings()
+            ->orderBy('id', 'desc')
+            ->get()
+        );
 
         return response()->json($housings);
     }
 
     /**
      * Show the form for creating a new resource.
+     * GET /housings/create
      */
     public function create()
     {
@@ -48,6 +56,7 @@ class HousingController extends Controller
 
     /**
      * Display a single housing
+     * GET housings/{id}
      */
     public function show(Request $request, Housing $housing)
     {
@@ -103,7 +112,7 @@ class HousingController extends Controller
 
     public function images(Request $request, Housing $housing)
     {
-        $housing->load('rooms', 'rooms.images', 'images', 'agents');
+        $housing->load('images');
 
         // Check if the housing has already an ImageAnalyzerAgent and it is finished (has_finished = true)
         $agent = $housing->agents()->where('name', 'ImageAnalyzerAgent')->first();
@@ -113,22 +122,24 @@ class HousingController extends Controller
             return redirect()->route('housings.showQuestionnaire', ['housing' => $housing]);
         }
 
-        return Inertia::render('Housing', ['section' => 'images', 'housing' => $housing]);
-    }
-
-    public function editRooms(Request $request, Housing $housing)
-    {
-        $housing->load('rooms', 'rooms.images');
-        return Inertia::render('Housing', ['section' => 'editRooms', 'housing' => $housing]);
+        return Inertia::render('Housing', ['section' => 'images', 'housing' => $housing, 'agent' => $agent ?? null]);
     }
 
     public function showQuestionnaire(Request $request, Housing $housing)
     {
-        $housing->load('rooms', 'rooms.images', 'agents');
+        // We cannot start the questionnaire until images are uploaded and set. Therefore:
+        // Check, if housing has an agent ImageAnalyzerAgent. If not or the Agent is not finished, redirect to /housing/id/images
+        $agent = $housing->agents()->where('name', 'ImageAnalyzerAgent')->first();
+
+        if(!$agent || !$agent->has_finished) {
+            return redirect()->route('housing.images', ['housing' => $housing]);
+        }
+
+        $housing->load('rooms', 'rooms.images');
 
         // If no rooms are present, redirect to the /housing/id/images
         if($housing->rooms->count() == 0) {
-            return redirect()->route('housing.images', ['housing' => $housing]);
+            return redirect()->route('housing.images', ['housing' => $housing, 'agent' => $agent ?? null]);
         }
 
         return Inertia::render('Housing', ['section' => 'showQuestionnaire', 'housing' => $housing]);
@@ -146,7 +157,7 @@ class HousingController extends Controller
         }
 
         // Get all writing styles to the user
-        $writingStyles = auth()->user()->writingStyles()->get();
+        $writingStyles = WritingStyleIndexResource::collection(auth()->user()->writingStyles()->get());
 
         return Inertia::render('Housing', ['section' => 'writingstyleSelect', 'housing' => $housing, 'writingStyles' => $writingStyles]);
     }
@@ -263,10 +274,11 @@ class HousingController extends Controller
         return redirect()->route('housings.run', ['housingId' => $housing->id]);
     }
 
-    public function run (Request $request, $housingId) {
+    public function run (Request $request, Housing $housing) {
+        // Load the housings` all finished agents
         $housing = Housing::with(['agents' => function ($query) {
-            $query->where('has_finished', false);
-        }])->find($housingId);
+            $query->where('has_finished', true);
+        }])->find($housing->id);
 
         return Inertia::render('Housing', ['section' => 'run', 'housing' => $housing]);
     }

@@ -25,6 +25,8 @@ class Kernel extends HttpKernel
 
     protected $routeMiddleware = [
         'isAdmin' => \App\Http\Middleware\IsAdmin::class,
+        'owns-resource' => \App\Http\Middleware\EnsureUserOwnsResource::class,
+        'owns-subresource' => \App\Http\Middleware\EnsureUserOwnsSubResource::class,
     ];
 
     /**

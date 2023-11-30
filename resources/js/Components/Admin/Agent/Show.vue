@@ -1,7 +1,6 @@
 <script setup>
   import { ref } from 'vue';
-  import { usePage } from '@inertiajs/vue3'
-  import { Head } from '@inertiajs/vue3';
+  import { usePage, router, Head } from '@inertiajs/vue3'
   import Spinner from '@/Components/Spinner.vue'
   import Agent from '@/Models/Agent'
 
@@ -11,9 +10,8 @@
   const save = async () => {
     loading.value = true
 
-    await axios.put('/api/availableagents/' + page.props.agent.data.id, page.props.agent.data)
-
-    loading.value = false
+    await axios.put(route('availableagents.update', page.props.agent.data.id), page.props.agent.data)
+    router.get(route('availableagents.index'))
   }
 </script>
 

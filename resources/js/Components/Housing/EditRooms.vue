@@ -10,7 +10,7 @@
   import HousingImage from '@/Models/HousingImage'
   import Agent from '@/Models/Agent'
 
-  import { useHousingStore } from '@/Store/housing'
+  import { useHousingStore } from '@/Store/Housing'
 
   const housingStore = useHousingStore()
 

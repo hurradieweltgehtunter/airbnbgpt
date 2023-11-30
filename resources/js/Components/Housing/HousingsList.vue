@@ -1,15 +1,8 @@
 <script setup>
-  import { onMounted } from 'vue';
-  import { ref } from 'vue';
   import { useHousingStore } from '@/Store/Housing'
-  import Spinner from '@/Components/Spinner.vue';
   import Button from '@/Components/UI/Button.vue';
-  const housings = ref([]);
-  const housingStore = useHousingStore()
 
-  onMounted (async () => {
-    await housingStore.fetchHousings()
-  });
+  const housingStore = useHousingStore()
 
 </script>
 
@@ -22,7 +15,7 @@
               Unterkünfte
           </th>
           <th scope="col" class="px-6 py-3 text-right">
-            <Button :href="route('housings.create')" as="a" :style="'primary'" class="text-sm">
+            <Button :href="route('housings.create')" as="a" variant="primary" class="text-sm">
               <svg class="w-3 h-3 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 5.757v8.486M5.757 10h8.486M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
               </svg>
