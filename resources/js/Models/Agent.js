@@ -42,7 +42,8 @@ export default class Agent {
         };
       } else {
         const response = await axios.post(`/api/agents/${this.data.id}/run`, postData);
-        return response.data;
+        if(response)
+            return response.data;
       }
     } catch (error) {
       console.error(error);
