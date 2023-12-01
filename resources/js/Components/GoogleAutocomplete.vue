@@ -1,5 +1,5 @@
 <template>
-  <input ref="input" id="autocomplete-input" />
+  <input ref="addressInput" id="addressInput" autocomplete="off" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
 </template>
 
 <script setup>
@@ -17,7 +17,7 @@
     }
   })
 
-  const userinput = ref('')
+  const addressInput = ref('')
 
 /**
  * if address is already confirmed:
@@ -36,7 +36,7 @@ service.getDetails(request, callback);
     });
 
     loader.load().then(async () => {
-      const input = document.getElementById("autocomplete-input");
+      const input = document.getElementById("addressInput");
       await google.maps.importLibrary("places");
 
       const autocomplete = new google.maps.places.Autocomplete(input, {
@@ -77,12 +77,20 @@ service.getDetails(request, callback);
         emit('placeReceived', formattedPlace);
       });
     });
+
+    // Fokus the input
+    addressInput.value.focus();
   });
 </script>
 
-<style>
+<style lang="scss">
   input {
     width: 100%;
+  }
+
+  .pac-item {
+    padding: 0.5rem;
+    font-size: 0.875rem !important;
   }
 
   .pac-icon {
@@ -91,5 +99,11 @@ service.getDetails(request, callback);
 
   .pac-container, .pac-container * {
     font-family: Figtree, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+  }
+
+  .pac-container {
+    &:after {
+      display: none !important;
+    }
   }
 </style>
