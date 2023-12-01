@@ -275,19 +275,20 @@ class Agent extends Model
     private function getFakeResponse() {
         $fakeResponse = $this->fake_responses[$this->model];
 
-        if(isset($fakeResponse['choices'][0]['message']['function_call'])) {
-            $fakeResponse['choices'][0]['message']['function_call']['arguments'] = json_encode($fakeResponse['choices'][0]['message']['function_call']['arguments']);
-        }
-
         return $fakeResponse;
     }
 
-    public function finished() {
-        return true;
-    }
-
+    /**
+     * Method to fix Umlauts in AI responses. GPT4-1106 model has some issues. As long they are not solved, we try to fix the umlauts here.
      */
     public function fixUmlauts($message) {
+        if(is_array($message)) {
+            foreach($message as $key => $value) {
+                $message[$key] = $this->fixUmlauts($value);
+            }
+
+            return $message;
+        }
 
         $message = str_replace('"a', 'ä', $message);
         $message = str_replace('"o', 'ö', $message);

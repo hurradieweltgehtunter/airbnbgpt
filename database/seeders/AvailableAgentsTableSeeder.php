@@ -48,16 +48,16 @@ class AvailableAgentsTableSeeder extends Seeder
                                 'index' => 0,
                                 'message' => [
                                     'role' => 'assistant',
-                                    'content' => null,
-                                    'toolCalls' => [
+                                    'content' => "",
+                                    'tool_calls' => [
                                         [
                                             'id' => 'asasdasdjiofhu43677',
                                             'type' => 'function',
                                             'function' => [
                                                 'name' => 'select_action',
-                                                'arguments' => [
+                                                'arguments' => json_encode([
                                                     'action' => 'default_handler'
-                                                ]
+                                                ])
                                             ]
                                         ]
                                     ],
@@ -160,44 +160,43 @@ class AvailableAgentsTableSeeder extends Seeder
                                 'message' => [
                                     'role' => 'assistant',
                                     'content' => null,
-                                    'toolCalls' => [
+                                    'tool_calls' => [
                                         [
-                                            'id' => 'asasdasdjiofhu43677',
+                                            'id' => 'call_cjkno9Q6CJ4qRJLRiYQAarOp',
                                             'type' => 'function',
                                             'function' => [
-                                                [
-                                                    'name' => 'default_handler',
-                                                    'arguments' => [
-                                                        'q' => 'FAKE: Wie viele Zimmer hat die Unterkunft?',
-                                                        'p' => [
-                                                            'l' => 0,
-                                                            's' => 0,
-                                                            't' => 0,
-                                                            'f' => 0,
-                                                            'g' => 0,
-                                                        ],
-                                                        'o' => [
-                                                            '1',
-                                                            '2',
-                                                            '3',
-                                                            '4',
-                                                            '5',
-                                                            '6',
-                                                            '7',
-                                                            '8',
-                                                            '9',
-                                                            '10',
-                                                        ],
-                                                        'mo' => false,
-                                                        'f' => true,
-                                                    ]
-                                                ],
+                                                'name' => 'default_handler',
+                                                'arguments' => json_encode([
+                                                    'q' => 'FAKE: Wie viele Zimmer hat die Unterkunft?',
+                                                    'p' => [
+                                                        'l' => 0,
+                                                        's' => 0,
+                                                        't' => 0,
+                                                        'f' => 0,
+                                                        'g' => 0,
+                                                    ],
+                                                    'o' => [
+                                                        '1',
+                                                        '2',
+                                                        '3',
+                                                        '4',
+                                                        '5',
+                                                        '6',
+                                                        '7',
+                                                        '8',
+                                                        '9',
+                                                        '10',
+                                                    ],
+                                                    'mo' => false,
+                                                    'f' => true,
+                                                ])
                                             ]
                                         ]
                                     ],
-                                    'function_call' => null
+                                    'functionCall' => null
                                 ]
                             ],
+                            'finishReason' => 'stop',
                         ]
                     ]
                         ]),
@@ -396,13 +395,13 @@ Formuliere deine Antwort unbedingt als Anweisung, die ich einem Texter geben kan
                                             'type' => 'function',
                                             'function' => [
                                                 'name' => 'handle_texts',
-                                                'arguments' => [
+                                                'arguments' => json_encode([
                                                     'title' => 'Ein SEO-optimierter, prägnanter Titel für das Inserat. (max. 50 Zeichen)',
                                                     'description' => 'Vermittle meinen Gästen ein Gefühl dafür, wie es ist, in meiner Unterkunft zu wohnen. Nenne die Gründe, warum sie ihren Aufenthalt dort genießen werden (max. 500 Zeichen)',
                                                     'accomodation' => 'Beschreibe, wie die Unterkunft und die Zimmer aussehen, damit Gäste wissen, womit sie rechnen können.',
                                                     'guest_accessibility' => 'Informiere meine Gäste darüber, zu welchen Bereichen innerhalb der Unterkunft sie Zugang haben werden.',
                                                     'more' => 'Nenne alle Besonderheiten, die du potenziellen Gästen vor der Buchung mitteilen möchtest und die in den anderen Abschnitten nicht erwähnt werden.',
-                                                ]
+                                                ])
                                             ]
                                         ]
                                     ],
@@ -485,13 +484,13 @@ Formuliere deine Antwort unbedingt als Anweisung, die ich einem Texter geben kan
                                                 'type' => 'function',
                                                 'function' => [
                                                     'name' => 'handle_texts',
-                                                    'arguments' => [
+                                                    'arguments' => json_encode([
                                                         'title' => 'Ein SEO-optimierter, prägnanter Titel für das Inserat. (max. 50 Zeichen)',
                                                         'description' => 'Vermittle meinen Gästen ein Gefühl dafür, wie es ist, in meiner Unterkunft zu wohnen. Nenne die Gründe, warum sie ihren Aufenthalt dort genießen werden (max. 500 Zeichen)',
                                                         'accomodation' => 'Beschreibe, wie die Unterkunft und die Zimmer aussehen, damit Gäste wissen, womit sie rechnen können.',
                                                         'guest_accessibility' => 'Informiere meine Gäste darüber, zu welchen Bereichen innerhalb der Unterkunft sie Zugang haben werden.',
                                                         'more' => 'Nenne alle Besonderheiten, die du potenziellen Gästen vor der Buchung mitteilen möchtest und die in den anderen Abschnitten nicht erwähnt werden.',
-                                                    ]
+                                                    ])
                                                 ]
                                             ]
                                         ],

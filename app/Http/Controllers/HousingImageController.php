@@ -10,26 +10,13 @@ use Illuminate\Support\Facades\Storage;
 class HousingImageController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Stores a new image to the given housing
      */
-    public function store(Request $request, Housing $housing)
+    public function store(Request $request)
     {
+        $data = $request->all();
+        $housing = Housing::findOrFail($data['housingId']);
+
         // Get the number of already existing images
         $imageCount = count($housing->images);
 
@@ -61,35 +48,19 @@ class HousingImageController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(HousingImage $housingImage)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(HousingImage $housingImage)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Housing $housing, HousingImage $housingImage)
+    public function update(Request $request, HousingImage $image)
     {
         foreach($request->all() as $key => $value) {
-            $housingImage->$key = $value;
+            $image->$key = $value;
         }
 
         try {
-            $housingImage->save();
+            $image->save();
         } catch(\Exception $e) {
             return response()->json([
-                'message' => 'Es ist ein Fehler aufgetreten.'
+                'message' => 'Es ist ein Fehler aufgetreten:' . $e->getMessage()
             ], 500);
         }
 
@@ -101,16 +72,16 @@ class HousingImageController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Housing $housing, HousingImage $housingImage)
+    public function destroy(Housing $housing, HousingImage $image)
     {
         // Load the room the image bleongs to
-        $room = $housingImage->room;
+        $room = $image->room;
 
-        // Delete the file in $housingImage->path
-        $path = str_replace(url('/'), '', $housingImage->path);
+        // Delete the file in $image->path
+        $path = str_replace(url('/'), '', $image->path);
         Storage::delete($path);
 
-        $housingImage->delete();
+        $image->delete();
 
         if($room == null) {
             return response()->noContent();

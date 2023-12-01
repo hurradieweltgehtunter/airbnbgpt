@@ -15,6 +15,7 @@ use App\Factories\AgentFactory;
 
 use App\Http\Resources\MessageResource;
 use App\Http\Resources\HousingResource;
+use App\Http\Resources\HousingIndexResource;
 use App\Http\Resources\AgentResource;
 use App\Http\Resources\WritingStyleIndexResource;
 

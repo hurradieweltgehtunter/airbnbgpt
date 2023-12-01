@@ -44,7 +44,7 @@
 
   // Uppy config
   const XHRconfig = computed(() => ({
-    endpoint: route('images.store', housing.data.id),
+    endpoint: route('images.store'),
     formData: true,
     headers: {
       'X-CSRF-Token': page.props.auth.csrf_token
@@ -105,7 +105,7 @@
 <template>
   <div>
     <Head title="Bilder zur Unterkunft hinzufügen" />
-    <Uppy :onUploadSuccess="onUploadSuccess" :meta="{ 'housingId': housing.id }" :XHRconfig="XHRconfig" :maxFiles="10"></Uppy>
+    <Uppy :onUploadSuccess="onUploadSuccess" :meta="{ 'housingId': housing.data.id }" :XHRconfig="XHRconfig" :maxFiles="10"></Uppy>
 
     <form @submit.prevent="createRooms">
       <div class="flex justify-end items-center my-4">

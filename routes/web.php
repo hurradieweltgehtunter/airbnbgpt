@@ -86,10 +86,6 @@ Route::prefix('housings')->name('housings.')->middleware(['auth', 'verified', 'o
     Route::patch('/{housing}/rooms', [HousingRoomController::class, 'create'])->name('createRooms');
 });
 
-// HousingImages CRUD Operations
-Route::resource('images', HousingImageController::class)
-    ->middleware(['auth', 'verified', 'owns-subresource:App\Models\HousingImage,App\Models\Housing,belongs_to']);
-
 // WRITINGSTYLE CRUD Operations
 Route::resource('styles', WritingStyleController::class)
     ->except(['edit'])
