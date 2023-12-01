@@ -4,12 +4,12 @@
   import { usePage } from '@inertiajs/vue3'
   import axios from 'axios'
   import Uppy from '@/Components/Uppy.vue'
-  import Spinner from '@/Components/Spinner.vue'
   import Housing from '@/Models/Housing'
   import HousingRoom from '@/Models/HousingRoom'
   import HousingImage from '@/Models/HousingImage'
-  import Agent from '@/Models/Agent'
+
   import Button from '@/Components/UI/Button.vue';
+  import PageIntro from '@/Components/UI/PageIntro.vue';
 
   import { useHousingStore } from '@/Store/Housing'
 
@@ -105,6 +105,11 @@
 <template>
   <div>
     <Head title="Bilder zur Unterkunft hinzufügen" />
+    <PageIntro>
+        <template #headline>Zeige deine Unterkunft – lade Bilder hoch!</template>
+        <template #content>Jetzt wird's visuell! Lade Fotos der verschiedenen Bereiche deiner Unterkunft hoch. Bitte gib nach dem Upload jedem Bild ein Label, um zu zeigen, welcher Raum abgebildet ist. Unsere KI analysiert deine Fotos und nutzt sie, um ansprechende Inseratstexte zu erstellen. Gute, klare Bilder von jedem Zimmer helfen der KI, die Einzigartigkeit deiner Unterkunft hervorzuheben – weniger Tipparbeit für dich!</template>
+    </PageIntro>
+
     <Uppy :onUploadSuccess="onUploadSuccess" :meta="{ 'housingId': housing.data.id }" :XHRconfig="XHRconfig" :maxFiles="10"></Uppy>
 
     <form @submit.prevent="createRooms">
