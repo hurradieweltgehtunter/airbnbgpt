@@ -21,7 +21,7 @@ class TestAgent extends Agent
 
     public function run($data = null) {
 
-        $response = parent::run();
+        [$response, $agentUsage] = parent::run();
 
         echo '<pre>';
             print_r($response);

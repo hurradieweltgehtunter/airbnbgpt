@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Agent;
 use App\Factories\AgentFactory;
+use Illuminate\Support\Facades\Auth;
 
 class WritingStyle extends Model
 {
@@ -28,6 +29,11 @@ class WritingStyle extends Model
     public function agents()
     {
         return $this->morphMany(Agent::class, 'agentable');
+    }
+
+    public function agentUsages()
+    {
+        return $this->morphMany(AgentUsage::class, 'entity');
     }
 
     public static function createForUser($userId, $attributes = [])

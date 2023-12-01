@@ -36,7 +36,7 @@ class WritingStyleAnalyzerAgent extends Agent
         $this->replacePlaceholder($initialMessage, 'exampleText', $data);
         $this->conversation->addMessage($initialMessage);
 
-        $response = parent::run();
+        [$response, $agentUsage] = parent::run();
 
         if(isset($response->toolCalls)) {
             $arguments = json_decode($response->toolCalls[0]->function->arguments);
@@ -49,9 +49,14 @@ class WritingStyleAnalyzerAgent extends Agent
         $writingStyle = new WritingStyle();
         $writingStyle->description = $description;
         $writingStyle->title = $title;
+        $writingStyle->user_id = Auth::id();
+        $writingStyle->save();
 
         // Delete the Analyzer Agent
         Agent::where('id', $this->id)->delete();
+
+        $agentUsage->setEntity($writingStyle);
+        $agentUsage->save();
 
         return $writingStyle;
     }

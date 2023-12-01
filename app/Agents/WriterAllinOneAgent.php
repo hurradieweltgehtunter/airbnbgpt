@@ -73,7 +73,7 @@ class WriterAllinOneAgent extends Agent
         $this->functionCall = ['name' => 'handle_texts'];
         $this->use_tools = false;
 
-        $response = parent::run();
+        [$response, $agentUsage] = parent::run();
 
         // save $response to text file in storage
         // Storage::put('AllinOneWriterResponse.txt', print_r($response, true));
@@ -101,6 +101,8 @@ class WriterAllinOneAgent extends Agent
         $this->has_finished = true;
         $this->save();
 
+        $agentUsage->setEntity($this->agentable)
+            ->save();
     }
 
     /**

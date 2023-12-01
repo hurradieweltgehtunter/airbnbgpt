@@ -98,11 +98,14 @@ class ImageDescriptionAgent extends Agent
                         Log::debug($message->role . ': ' . print_r($message->content, true));
                     }
 
-                    $returnMessage = parent::run();
+                    [$returnMessage, $agentUsage] = parent::run();
 
                     // get the room to $housing with label $label
                     $image->description = parent::fixUmlauts($returnMessage->content);
                     $image->save();
+
+                    $agentUsage->setEntity($image)
+                        ->save();
                 }
 
                 // Room is done, lets flush the data to the frontend

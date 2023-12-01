@@ -74,11 +74,14 @@ class ImageAnalyzerAgent extends Agent
                 Log::debug($message->role . ': ' . print_r($message->content, true));
             }
 
-            $returnMessage = parent::run();
+            [$returnMessage, $agentUsage] = parent::run();
 
             // get the room to $housing with label $label
             $room->description = parent::fixUmlauts($returnMessage->content);
             $room->save();
+
+            $agentUsage->setEntity($room)
+                ->save();
 
             // Reset the messages
             $this->loadMessagesIntoConversation();

@@ -89,10 +89,10 @@ class HousingQuestionnaireAgent extends Agent
             return ['type' => 'message', 'message' => new MessageResource($lastMessage)];
         }
 
-        $response = parent::run();
+        [$response, $agentUsage] = parent::run();
 
         // Handle the AI Response
-        if(isset($response->toolCalls)) {
+        if(isset($response->toolCalls) && count($response->toolCalls) > 0) {
             $arguments = json_decode($response->toolCalls[0]->function->arguments);
             $functionName = $response->toolCalls[0]->function->name;
 
@@ -100,6 +100,9 @@ class HousingQuestionnaireAgent extends Agent
         } else {
             $result = $response->content;
         }
+
+        $agentUsage->setEntity($this->agentable)
+            ->save();
 
         return response()->json($result);
     }
@@ -110,7 +113,7 @@ class HousingQuestionnaireAgent extends Agent
         Log::debug((array) $response);
 
         try {
-            $arguments = json_decode($response->functionCall->arguments);
+            $arguments = json_decode($response->toolCalls[0]->function->arguments);
 
             if($arguments->q === 'READY') {
                 return $this->closeAgent();

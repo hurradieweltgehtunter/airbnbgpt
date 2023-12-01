@@ -46,24 +46,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_admin' => 'boolean',
     ];
 
-    public function index()
-    {
-        return Inertia::render('Users/Index', [
-          'users' => User::all(),
-        ]);
-    }
-
-    public function store(Request $request)
-    {
-        User::create($request->validate([
-          'first_name' => ['required', 'max:50'],
-          'last_name' => ['required', 'max:50'],
-          'email' => ['required', 'max:50', 'email'],
-        ]));
-
-        return to_route('users.index');
-    }
-
     // Ein Benutzer kann viele Räume haben
     public function housings()
     {
@@ -80,5 +62,30 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sentMessages()
     {
         return $this->hasMany(Message::class, 'senderId');
+    }
+
+    public function agentUsages()
+    {
+        return $this->hasMany(AgentUsage::class);
+    }
+
+
+    // ToDo The following methods belong in the user controler, why are they here?
+    public function index()
+    {
+        return Inertia::render('Users/Index', [
+          'users' => User::all(),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        User::create($request->validate([
+          'first_name' => ['required', 'max:50'],
+          'last_name' => ['required', 'max:50'],
+          'email' => ['required', 'max:50', 'email'],
+        ]));
+
+        return to_route('users.index');
     }
 }

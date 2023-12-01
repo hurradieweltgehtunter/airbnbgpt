@@ -13,6 +13,7 @@ use App\Models\Message;
 use Illuminate\Support\Facades\Log;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Testing\ClientFake;
+use App\Models\AgentUsage;
 
 class Agent extends Model
 {
@@ -55,30 +56,6 @@ class Agent extends Model
         return $this->morphTo();
     }
 
-    // public function __construct($attributes = []) {
-    //     parent::__construct($attributes);
-    //     $this->initRuntime();
-    // }
-
-    // public function newFromBuilder($attributes = [], $connection = null) {
-    //     if (!empty($attributes->name)) {
-    //         $className = '\\App\\Agents\\' . $attributes->name . 'Agent';
-    //         if (class_exists($className)) {
-    //             $instance = new $className((array) [], $connection);
-    //             $instance->setRawAttributes((array) $attributes, true);
-    //             $instance->loadMessagesIntoConversation();
-    //             $instance->initRuntime();
-    //             return $instance;
-    //         } else {
-    //             throw new \Exception('Agent class not found: ' . $className);
-    //         }
-    //     }
-
-    //     throw new \Exception('Agent class not found: ' . $attributes->name);
-
-    //     return parent::newFromBuilder($attributes, $connection);
-    // }
-
     protected static function booted() {
         static::deleting(function ($agent) {
             $agent->messages()->each(function($message) {
@@ -100,7 +77,6 @@ class Agent extends Model
             }
         });
     }
-
 
     /**
      * Initializes the agent on runtime! This method gets called on every request
@@ -249,10 +225,13 @@ class Agent extends Model
 
             $AIResponse = OpenAI::chat()->create($params);
 
-            Log::debug('Agent::run: received AI message');
+            $agentUsage = AgentUsage::create($this, $AIResponse);
+            $agentUsage->save();
+
+            Log::debug('Agent::run: received AI message for agent ' . get_class($this));
             Log::debug((array) $AIResponse);
 
-            return $AIResponse->choices[0]->message;
+            return [$AIResponse->choices[0]->message, $agentUsage];
         } catch (\Exception $e) {
             Log::debug('Agent::run: ' . $e->getMessage());
             Log::debug((array) $params);
@@ -300,7 +279,6 @@ class Agent extends Model
             $fakeResponse['choices'][0]['message']['function_call']['arguments'] = json_encode($fakeResponse['choices'][0]['message']['function_call']['arguments']);
         }
 
-
         return $fakeResponse;
     }
 
@@ -308,7 +286,9 @@ class Agent extends Model
         return true;
     }
 
+     */
     public function fixUmlauts($message) {
+
         $message = str_replace('"a', 'ä', $message);
         $message = str_replace('"o', 'ö', $message);
         $message = str_replace('"u', 'ü', $message);
