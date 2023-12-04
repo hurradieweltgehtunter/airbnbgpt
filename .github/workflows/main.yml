@@ -35,6 +35,7 @@ jobs:
         server: w00f6144.kasserver.com
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: ./
         exclude: >
           - .htaccess
           - .env.example
