@@ -13,7 +13,7 @@ class AvailableAgentsTableSeeder extends Seeder
             [
                 'name'              => 'TestAgent',
                 'use_tools'         => false,
-                'model'             => 'gpt-3.5-turbo',
+                'gpt_model_id'      => 1,
                 'description'       => 'Test',
                 'system_prompt'     => 'Verhalte und antworte wie William Shakespeare. Verfasse deine Antworten in Alt-Deutsch.',
                 'initial_message'   => json_encode(['role' => 'user', 'content' => 'Begrüße mich überschwänglich.']),
@@ -38,7 +38,7 @@ class AvailableAgentsTableSeeder extends Seeder
             [
                 'name'              => 'ActionSelectorAgent',
                 'use_tools'         => false,
-                'model'             => 'gpt-3.5-turbo',
+                'gpt_model_id'      => 1,
                 'description'       => 'Ein Agent, der eine Usermessage analysiert und ermittelt welche Funktion benutzt werden soll.',
                 'fake_enabled'      => true,
                 'fake_responses'    => json_encode([
@@ -101,7 +101,7 @@ class AvailableAgentsTableSeeder extends Seeder
                 'system_prompt'     => 'Beschreibe die Bilder. Verzichte auf Hinweise, Warnungen etc., Verzichte auf Formtierungen wie Zeilenumbrüche.',
                 'use_tools'         => false,
                 'initial_message'   => json_encode(['role' => 'user', 'content' => 'Du siehst Bilder meiner Unterkunft. Der Teil meiner Unterkunft, der auf den Bildern zu sehen ist: {{label}}. Erstelle eine genaue Beschreibung der Einrichtung. Halte dich kurz und stichwortartig. Diese Beschreibung soll später dazu dienen, ansprechende Texte für AirBnB zu erstellen. maximal 600 Zeichen']),
-                'model'             => 'gpt-4-vision-preview',
+                'gpt_model_id'      => 2,
                 'fake_enabled'      => true,
                 'fake_responses'    => json_encode([
                     'gpt-4-vision-preview' => [
@@ -126,7 +126,7 @@ class AvailableAgentsTableSeeder extends Seeder
                 'system_prompt'     => 'Beschreibe die Bilder. Verzichte auf Hinweise, Warnungen etc., Verzichte auf Formtierungen wie Zeilenumbrüche.',
                 'use_tools'         => false,
                 'initial_message'   => json_encode(['role' => 'user', 'content' => 'Du siehst Bilder meiner Unterkunft. Der Teil meiner Unterkunft, der auf den Bildern zu sehen ist: {{label}}. Erstelle eine 250 Zeichen lange Bildbeschreibung. Es soll potenziellen Gästen einen Eindruck davon vermitteln, wie es ist, in meiner Unterkunft zu wohnen.']),
-                'model'             => 'gpt-4-vision-preview',
+                'gpt_model_id'      => 2,
                 'fake_enabled'      => true,
                 'fake_responses'    => json_encode([
                     'gpt-4-vision-preview' => [
@@ -148,7 +148,7 @@ class AvailableAgentsTableSeeder extends Seeder
             [
                 'name'              => 'HousingQuestionnaireAgent',
                 'description'       => 'Ein Agent, der Informationen über eine Unterkunft sammelt und diese Informationen in Texte umwandeln kann.',
-                'model'             => 'gpt-4-1106-preview',
+                'gpt_model_id'      => 4,
                 'use_tools'         => true,
                 'tool_choice'       => 'default_handler',
                 'fake_enabled'      => true,
@@ -311,7 +311,7 @@ class AvailableAgentsTableSeeder extends Seeder
             [
                 'name'              => 'WritingStyleAnalyzerAgent',
                 'description'       => 'Ein Agent, der Beispieltexte analysiert und eine Vorlage gibt, Texte im gleichen Stil zu schreiben',
-                'model'             => 'gpt-4',
+                'gpt_model_id'      => 3,
                 'system_prompt'     => 'Du bist ein Sprachgenie und analysierst Texte. nichts anderes.',
                 'use_tools'         => true,
                 'tool_choice'       => 'analysis_handler',
@@ -376,7 +376,7 @@ Formuliere deine Antwort unbedingt als Anweisung, die ich einem Texter geben kan
             [
                 'name'              => 'WriterAgent',
                 'description'       => 'Ein Agent, der die Texte schreibt',
-                'model'             => 'gpt-4',
+                'gpt_model_id'      => 3,
                 'system_prompt'     => 'Du bist sehr gut im formulieren von deutschen Texten. Du achtest sehr genau auf korrekte deutsche Grammatik und Rechtschreibung.',
                 'use_tools'         => true,
                 'tool_choice'       => 'handle_texts',
@@ -464,7 +464,7 @@ Formuliere deine Antwort unbedingt als Anweisung, die ich einem Texter geben kan
             [
                 'name'              => 'WriterAllinOneAgent',
                 'description'       => 'Ein Agent, der die Texte schreibt',
-                'model'             => 'gpt-4-vision-preview',
+                'gpt_model_id'      => 2,
                 'system_prompt'     => 'Du bist Experte im Formulieren von deutschen, ansprechenden Texten. Achte sehr genau auf korrekte deutsche Grammatik und Rechtschreibung.',
                 'use_tools'         => true,
                 'tool_choice'       => 'handle_texts',

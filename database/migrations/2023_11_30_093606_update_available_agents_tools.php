@@ -23,11 +23,6 @@ return new class extends Migration
             \DB::statement("ALTER TABLE available_agents CHANGE COLUMN use_functions use_tools BOOLEAN");
             $table->string('tool_choice')->nullable(true)->description('The tool to use for the AI')->after('use_tools');
         });
-
-        Artisan::call('db:seed', [
-            '--class' => 'AvailableAgentsTableSeeder',
-            '--force' => true
-        ]);
     }
 
     /**

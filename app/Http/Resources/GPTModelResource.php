@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\WritingStyleResource;
 
-class AvailableAgentResource extends JsonResource
+class GPTModelResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,15 +15,12 @@ class AvailableAgentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $return = [
+        return [
             'id' => $this->id,
             'name' => $this->name,
-            'fake_enabled' => $this->fake_enabled,
-            'initial_message' => $this->initial_message,
-            'system_prompt' => $this->system_prompt,
-            'gpt_model_id' => $this->gpt_model_id,
+            'cost_input_1k' => $this->cost_input_1k,
+            'cost_output_1k' => $this->cost_output_1k,
+            'enabled' => $this->enabled,
         ];
-
-        return $return;
     }
 }

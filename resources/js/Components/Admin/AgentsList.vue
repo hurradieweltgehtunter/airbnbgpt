@@ -17,7 +17,7 @@
   <div>
     <div>
       <ul>
-        <li v-for="(agent, index) in page.props.agents" :key="index" class="mb-2">
+        <li v-for="(agent, index) in page.props.availableagents.data" :key="index" class="mb-2">
           <AgentListItem :agent="agent" />
         </li>
       </ul>

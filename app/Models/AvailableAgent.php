@@ -14,7 +14,7 @@ class AvailableAgent extends Model
         'description',
         'system_prompt',
         'initial_message',
-        'model',
+        'gpt_model_id',
         'use_tools',
         'tools',
         'fake_responses',
@@ -26,6 +26,12 @@ class AvailableAgent extends Model
         'tools' => 'array',
         'use_tools' => 'boolean',
         'fake_responses' => 'array',
-        'fake_enabled' => 'boolean'
+        'fake_enabled' => 'boolean',
+        'model' => 'integer'
     ];
+
+    public function gptmodel()
+    {
+        return $this->belongsTo(GPTModel::class, 'gpt_model_id');
+    }
 }

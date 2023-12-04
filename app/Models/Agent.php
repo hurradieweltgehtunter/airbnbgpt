@@ -33,7 +33,6 @@ class Agent extends Model
 
     // Properties, which will be taken from available Agent on runtime (initRuntime())
     public $system_prompt;
-    public $model;
     public $tools;
     public $tool_choice;
     public $use_tools;
@@ -54,6 +53,15 @@ class Agent extends Model
     public function agentable()
     {
         return $this->morphTo();
+    }
+
+    public function blueprintAgent() {
+        return $this->belongsTo(AvailableAgent::class, 'name', 'name');
+    }
+
+    public function getGptmodelAttribute()
+    {
+        return $this->blueprintAgent->gptmodel;
     }
 
     protected static function booted() {
@@ -88,7 +96,7 @@ class Agent extends Model
         $availableAgent = $agentService->getAgentByName($this->name);
 
         $this->system_prompt = $availableAgent->system_prompt;
-        $this->model = $availableAgent->model;
+
         $this->tools = $availableAgent->tools;
         $this->use_tools = $availableAgent->use_tools;
         $this->tool_choice = $availableAgent->tool_choice ? ["type" => "function", "function" => ["name" => $availableAgent->tool_choice]] : 'none';
@@ -198,7 +206,7 @@ class Agent extends Model
      */
     public function run($data = null) {
         $params = [
-            'model' => $this->model,
+            'model' => $this->gptmodel->name,
             'messages' => $this->prepareMessages(),
             'max_tokens' => 1000
         ];
@@ -273,7 +281,7 @@ class Agent extends Model
      * Returns a fake but valid response to reduce AI API costs
      */
     private function getFakeResponse() {
-        $fakeResponse = $this->fake_responses[$this->model];
+        $fakeResponse = $this->fake_responses[$this->gptmodel->name];
 
         return $fakeResponse;
     }
