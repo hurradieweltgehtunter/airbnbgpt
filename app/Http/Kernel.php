@@ -25,6 +25,7 @@ class Kernel extends HttpKernel
 
     protected $routeMiddleware = [
         'isAdmin' => \App\Http\Middleware\IsAdmin::class,
+        'isAdminSigned' => \App\Http\Middleware\IsAdminSigned::class,
         'owns-resource' => \App\Http\Middleware\EnsureUserOwnsResource::class,
         'owns-subresource' => \App\Http\Middleware\EnsureUserOwnsSubResource::class,
     ];
@@ -73,5 +74,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'isAdmin' => \App\Http\Middleware\IsAdmin::class,
+        'isAdminSigned' => \App\Http\Middleware\isAdminSigned::class,
     ];
 }

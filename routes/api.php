@@ -11,6 +11,8 @@ use App\Http\Controllers\AgentController;
 use App\Http\Controllers\AvailableAgentController;
 use App\Http\Controllers\WritingStyleController;
 use App\Http\Controllers\WritingStyleExampleController;
+use App\Http\Controllers\Admin\AdminController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -50,6 +52,13 @@ Route::prefix('agents')->name('agents.')->middleware(['auth', 'verified'])->grou
     Route::get('/{agent}/run', [AgentController::class, 'runAgent'])->name('runAgent');
     Route::post('/{agentId}/messages', [MessageController::class, 'store'])->name('store');
 });
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'isAdmin', 'isAdminSigned'])->group(function () {
+    Route::get('/down', [AdminController::class, 'down'])->name('down');
+    Route::get('/up', [AdminController::class, 'up'])->name('up');
+    Route::get('/migrate', [AdminController::class, 'migrate'])->name('migrate');
+});
+
 
 
 // Route::prefix('availableagents')->name('availableagents.')->middleware(['auth', 'verified'])->group(function () {

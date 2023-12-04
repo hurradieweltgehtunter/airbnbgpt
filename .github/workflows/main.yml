@@ -1,0 +1,46 @@
+name: Laravel CI
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: mbstring, xml, ctype, iconv, intl, mysql, pdo, tokenizer, json, gd, curl
+        tools: composer, php-cs-fixer
+
+    - name: Install PHP dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+
+    - name: Install NPM dependencies
+      run: npm install
+
+    - name: Build Vue Frontend
+      run: npm run build
+
+    - name: Deploy to Webserver via FTP
+      uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      with:
+        ftp-server: ftp://yourftpserver.com
+        ftp-username: ${{ secrets.FTP_USERNAME }}
+        ftp-password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: .
+        git-ftp-args: --insecure
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+
+    - name: Send Down Webhook
+      run: curl -X POST https://bnbgpt.de/api/admin/down?key=${{ secrets.ADMIN_SECRET }}
+
