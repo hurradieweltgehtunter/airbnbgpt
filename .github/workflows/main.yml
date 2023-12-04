@@ -30,15 +30,17 @@ jobs:
 
 
     - name: Deploy to Webserver via FTP
-      uses: SamKirkland/FTP-Deploy-Action@4.3.4
+      uses: SamKirkland/FTP-Deploy-Action@4.1.0
       with:
         server: w00f6144.kasserver.com
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
+        exclude: >
+          - .htaccess
+          - .env.example
+          - **/.git*
+          - **/.git*/**
+          - **/node_modules/**
 
     - name: Send Down Webhook
       run: curl -X POST https://bnbgpt.de/api/admin/down?key=${{ secrets.ADMIN_SECRET }}
