@@ -70,7 +70,6 @@ class WriterAllinOneAgent extends Agent
 
         $this->prepareMessages();
 
-        $this->functionCall = ['name' => 'handle_texts'];
         $this->use_tools = false;
 
         [$response, $agentUsage] = parent::run();
