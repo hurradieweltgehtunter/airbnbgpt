@@ -246,41 +246,90 @@ class HousingController extends Controller
          * 2) Generate texts with writingStyle
          */
 
+        Log::debug('HousingController@prepare: Start preparing housing ' . $housing->id . ' with writing style ' . $writingStyle->id);
+
         // 1) Check if images are available. If not redirect to /housing/id/images
-        // if($housing->images()->count() == 0) {
-        //     return redirect()->route('housings.images', ['housing' => $housing]);
-        // }
+        if($housing->images()->count() == 0) {
+            Log::debug('HousingController@prepare: No images found for housing ' . $housing->id . '. Redirecting to /housing/id/images');
+            return redirect()->route('housings.images', ['housing' => $housing]);
+        }
 
-        // // 2) Check, if housing has an Agent with name HousingQuestionnaireAgent. Check if its last message is "READY"
-        // $agent = $housing->agents()->where('name', 'HousingQuestionnaireAgent')->first();
+        Log::debug('HousingController@prepare: Found ' . $housing->images()->count() . ' images for housing ' . $housing->id);
 
-        // if(!$agent) {
-        //     // If not, redirect
-        //     return redirect()->route('housings.showQuestionnaire', ['housing' => $housing]);
-        // }
+        // 2) Check, if housing has an Agent with name HousingQuestionnaireAgent.
+        $agent = $housing->agents()->where('name', 'HousingQuestionnaireAgent')->first();
 
-        // // 3) Check if writing style is available and if it belongs to the auth user
-        // if($writingStyle->user_id === auth()->user()->id) {
-        //     // If not, redirect
-        //     return redirect()->route('housings.writingstyleSelect', ['housing' => $housing]);
-        // }
+        if(!$agent || !$agent->has_finished) {
+            // If not, redirect
+            Log::debug('HousingController@prepare: No questionnaire found for housing ' . $housing->id . '. Redirecting to /housing/id/questionnaire');
+            return redirect()->route('housings.showQuestionnaire', ['housing' => $housing]);
+        }
+
+        Log::debug('HousingController@prepare: Found finished questionnaire for housing ' . $housing->id . '.');
+
+        // 3) Check if writing style is available and if it belongs to the auth user
+        if($writingStyle->user_id != auth()->user()->id) {
+            // If not, redirect
+            Log::debug('HousingController@prepare: Writing style ' . $writingStyle->id . ' does not belong to user ' . auth()->user()->id . '. Redirecting to /housing/id/writingstyleSelect');
+            return redirect()->route('housings.writingstyleSelect', ['housing' => $housing]);
+        }
+
+        Log::debug('HousingController@prepare: Writing style ' . $writingStyle->id . ' belongs to user ' . auth()->user()->id . '.');
 
         // Chekup done, create the agents
+        // Check, if there are already ImageDescriptionAgents. If so, delete it
+        $imageAgents = $housing->agents()->where('name', 'ImageDescriptionAgent')->get();
+
+        foreach($imageAgents as $agent) {
+            if(!$agent->has_finished)
+            {
+                $agent->delete();
+                Log::debug('HousingController@prepare: Deleted unfinished ImageDescriptionAgent for housing ' . $housing->id);
+            } else {
+                Log::debug('HousingController@prepare: ImageDescriptionAgent for housing ' . $housing->id . ' is already finished. Redeirecting to show housing.');
+                return redirect()->route('housings.show', ['housing' => $housing]);
+            }
+        }
+
+        // Create the ImageDescriptionAgent
         $imageAgent = AgentFactory::createNew('ImageDescriptionAgent', $housing, ['parameters' => ['writing_style_id' => $writingStyle->id]]);
         $imageAgent->save();
+        Log::debug('HousingController@prepare: Created ImageDescriptionAgent for housing ' . $housing->id . ' with id ' . $imageAgent->id);
+
+        // Check, if there are already WriterAllinOneAgents. If so, delete it
+        $writerAgents = $housing->agents()->where('name', 'WriterAllinOneAgent')->get();
+
+        foreach($writerAgents as $writerAgent) {
+            if(!$writerAgent->has_finished)
+            {
+                $writerAgent->delete();
+                Log::debug('HousingController@prepare: Deleted unfinished WriterAllinOneAgent for housing ' . $housing->id);
+            } else {
+                Log::debug('HousingController@prepare: WriterAllinOneAgent for housing ' . $housing->id . ' is already finished. Redirecting to show housing.');
+                return redirect()->route('housings.show', ['housing' => $housing]);
+                break;
+            }
+        }
+
+        // Create the WriterAllinOneAgent
         $writerAgent = AgentFactory::createNew('WriterAllinOneAgent', $housing, ['parameters' => ['writing_style_id' => $writingStyle->id]]);
         $writerAgent->save();
+        Log::debug('HousingController@prepare: Created WriterAllinOneAgent for housing ' . $housing->id . ' with id ' . $writerAgent->id);
 
-        // Redirect to /housing/id/run and include all agents
-        return redirect()->route('housings.run', ['housingId' => $housing->id]);
+        // Redirect to /housing/id/run
+        Log::debug('HousingController@prepare: Redirecting to /housing/' . $housing->id . '/run');
+        return redirect()->route('housings.run', ['housing' => $housing]);
     }
 
     public function run (Request $request, Housing $housing) {
+        Log::debug('HousingController@run: Start running housing ' . $housing->id);
+
         // Load the housings` all finished agents
         $housing = Housing::with(['agents' => function ($query) {
-            $query->where('has_finished', true);
+            $query->where('has_finished', false);
         }])->find($housing->id);
 
+        Log::debug('HousingController@run: Found ' . $housing->agents->count() . ' open agents for housing ' . $housing->id);
         return Inertia::render('Housing', ['section' => 'run', 'housing' => $housing]);
     }
 }
