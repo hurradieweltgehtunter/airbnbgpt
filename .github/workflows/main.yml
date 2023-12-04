@@ -31,9 +31,9 @@ jobs:
     - name: Deploy to Webserver via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
-        ftp-server: ftp://yourftpserver.com
-        ftp-username: ${{ secrets.FTP_USERNAME }}
-        ftp-password: ${{ secrets.FTP_PASSWORD }}
+        server: ftp://yourftpserver.com
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
         local-dir: .
         git-ftp-args: --insecure
         exclude: |
