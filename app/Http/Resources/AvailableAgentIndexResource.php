@@ -4,8 +4,9 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\WritingStyleResource;
 
-class WritingStyleIndexResource extends JsonResource
+class AvailableAgentIndexResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,8 +17,8 @@ class WritingStyleIndexResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'title' => $this->title,
-            'created_at' => $this->created_at,
+            'name' => $this->name,
+            'description' => $this->description,
         ];
     }
 }
