@@ -20,7 +20,7 @@ jobs:
         tools: composer, php-cs-fixer
 
     - name: Install PHP dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+      run: composer install --prefer-dist --no-progress
 
     - name: Install NPM dependencies
       run: npm install

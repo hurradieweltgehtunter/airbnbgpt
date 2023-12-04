@@ -60,7 +60,7 @@
         case 'showQuestionnaire':
           return defineAsyncComponent(() => import('@/Components/Housing/Questionnaire.vue'))
         case 'writingstyleSelect':
-          return defineAsyncComponent(() => import('@/Components/Housing/WritingstyleSelect.vue'))
+        return defineAsyncComponent(() => import('@/Components/Housing/WritingStyleSelect.vue'))
         default:
           return null
       }
