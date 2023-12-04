@@ -48,7 +48,7 @@
 
 <template>
   <div>
-    <Head title="Schreibstil wählen" />
+    <Head title="Inserat wird erstellt…" />
     <p v-for="(message, index) in messages" :key="index">{{ message }}</p>
 
   </div>

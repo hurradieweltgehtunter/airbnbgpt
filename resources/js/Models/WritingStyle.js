@@ -7,10 +7,16 @@ export default class WritingStyle {
     this.data = reactive({
       id: null,
       title: '',
-      description: ''
+      description: '',
+      created_at: null,
     });
 
     this.setData(data)
+  }
+
+  get created_at() {
+    let date = new Date(this.data.created_at);
+    return date.toLocaleDateString('de-DE');
   }
 
   setData (data) {

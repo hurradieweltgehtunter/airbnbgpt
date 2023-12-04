@@ -12,7 +12,6 @@ export const useWritingStyleStore = defineStore('writingStyles', {
   },
   actions: {
     fill(writingStyles) {
-
         // writingStyles must be of type array
         if (!Array.isArray(writingStyles)) {
           throw new Error('WritingStyleStore::fill: writingStyles must be of type array')
