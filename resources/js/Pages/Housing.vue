@@ -60,13 +60,12 @@
         case 'showQuestionnaire':
           return defineAsyncComponent(() => import('@/Components/Housing/Questionnaire.vue'))
         case 'writingstyleSelect':
-        return defineAsyncComponent(() => import('@/Components/Housing/WritingStyleSelect.vue'))
+            return defineAsyncComponent(() => import('@/Components/Housing/WritingStyle.vue'))
         default:
           return null
       }
     }
   })
-
 
   const addressComplete = computed(() => {
     return housing.value.addressIsComplete()
