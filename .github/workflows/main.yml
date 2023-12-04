@@ -30,7 +30,7 @@ jobs:
 
 
     - name: Deploy to Webserver via FTP
-      uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      uses: SamKirkland/FTP-Deploy-Action@4.3.4
       with:
         server: w00f6144.kasserver.com
         username: ${{ secrets.FTP_USERNAME }}
