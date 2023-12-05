@@ -8,7 +8,6 @@
   import GoogleMaps from '@/Components/GoogleMaps.vue'
   import Progress from '@/Components/Progress.vue'
   import Agent from '@/Models/Agent'
-  import PrimaryButton from '@/Components/UI/PrimaryButton.vue';
 
   const page = usePage()
   const loading = ref(false)
@@ -29,10 +28,8 @@
       default: () => new Agent()
     }
   })
-//   const agent = ref(new Agent(page.props.agent.data))
-  const housing = ref(new Housing(page.props.housing))
 
-  const GOOGLE_API_KEY = "AIzaSyC4JEY79cv6Ks4WwJLMP8vtAPybx8rbrmk"
+  const housing = ref(new Housing(page.props.housing))
 
   const loadingMessage = ref('Lass mich mal nachdenken…') // message to display while loading
 
@@ -108,7 +105,7 @@
       </div>
 
       <div class="col-span-3 sm:col-span-1">
-        <GoogleMaps v-if="addressComplete" :api-key="GOOGLE_API_KEY" :address="housing.getAddress()" style="width: 100%; height: 300px"></GoogleMaps>
+        <GoogleMaps v-if="addressComplete" :api-key="page.props.google_api_key" :address="housing.getAddress()" style="width: 100%; height: 300px"></GoogleMaps>
 
         <Progress :progress="progress"></Progress>
 
