@@ -53,14 +53,8 @@ Route::prefix('agents')->name('agents.')->middleware(['auth', 'verified'])->grou
     Route::post('/{agentId}/messages', [MessageController::class, 'store'])->name('store');
 });
 
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'isAdmin', 'isAdminSigned'])->group(function () {
-    Route::get('/down', [AdminController::class, 'down'])->name('down');
-    Route::get('/up', [AdminController::class, 'up'])->name('up');
-    Route::get('/migrate', [AdminController::class, 'migrate'])->name('migrate');
-});
-
-
-
-// Route::prefix('availableagents')->name('availableagents.')->middleware(['auth', 'verified'])->group(function () {
-//     Route::put('/{agentId}', [AvailableAgentController::class, 'update'])->name('update');
+// Route::prefix('admin')->name('admin.')->middleware(['isAdminSigned'])->group(function () {
+//     Route::get('/down', [AdminController::class, 'down'])->name('down');
+//     Route::get('/up', [AdminController::class, 'up'])->name('up');
+//     Route::get('/migrate', [AdminController::class, 'migrate'])->name('migrate');
 // });

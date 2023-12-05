@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -29,5 +30,11 @@ class AdminController extends Controller
      */
     public function migrate() {
         Artisan::call('migrate');
+        $migrateOutput = Artisan::output();
+        Log::info("Migration Output: " . $migrateOutput);
+
+        Artisan::call('db:seed', ['--class' => 'GptModelsTableSeeder']);
+        $seedOutput = Artisan::output();
+        Log::info("Seeder Output: " . $seedOutput);
     }
 }
