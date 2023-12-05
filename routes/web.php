@@ -49,27 +49,6 @@ Route::prefix('dashboard')->name('dashboard')->middleware(['auth', 'verified'])-
     Route::get('/', [DashboardController::class, 'index']);
 });
 
-Route::get('/scrape-airbnb', function () {
-    $process = new Process(['node', base_path('resources/js/Scraper/scraper.js')]);
-    $process->run();
-
-    if (!$process->isSuccessful()) {
-        throw new ProcessFailedException($process);
-    }
-
-    echo '<textarea>';
-    print_r($process->getOutput());
-    echo '</textarea>';
-
-    // get housing wiht id 1
-    $housing = \App\Models\Housing::find(1);
-
-    $agent = Agent::createFromName('AirbnbScraperAgent', $housing);
-    $agent->run('asd');
-
-});
-
-
 // HOUSING CRUD Operations
 Route::resource('housings', HousingController::class)
     ->middleware(['auth', 'verified', 'owns-resource:App\Models\Housing,belongs_to']);
