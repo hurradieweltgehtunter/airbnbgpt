@@ -42,7 +42,4 @@ jobs:
           - **/.git*
           - **/.git*/**
           - **/node_modules/**
-          - **/resources/**
-
-    - name: Send Down Webhook
-      run: curl -X POST https://bnbgpt.de/api/admin/down?key=${{ secrets.ADMIN_SECRET }}
+          - /resources/**
