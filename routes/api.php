@@ -37,7 +37,7 @@ Route::prefix('housings')->name('housing.')->middleware(['auth', 'verified'])->g
 });
 
 // HousingImages CRUD Operations
-// DOnt move this to web.php since the url collides with the static assets path /public/images
+// Dont move this to web.php since the url collides with the static assets path /public/images
 Route::resource('images', HousingImageController::class)
     ->except(['index', 'show', 'create', 'edit'])
     ->middleware(['auth', 'verified', 'owns-subresource:App\Models\HousingImage,App\Models\Housing,belongs_to']);

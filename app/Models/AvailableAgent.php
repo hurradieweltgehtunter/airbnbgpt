@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\GptModel;
 
 class AvailableAgent extends Model
 {
@@ -32,6 +33,6 @@ class AvailableAgent extends Model
 
     public function gptmodel()
     {
-        return $this->belongsTo(GPTModel::class, 'gpt_model_id');
+        return $this->belongsTo(GptModel::class, 'gpt_model_id');
     }
 }
