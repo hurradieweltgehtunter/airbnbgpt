@@ -27,7 +27,7 @@ class Kernel extends HttpKernel
         'isAdmin' => \App\Http\Middleware\IsAdmin::class,
         'isAdminSigned' => \App\Http\Middleware\IsAdminSigned::class,
         'owns-resource' => \App\Http\Middleware\EnsureUserOwnsResource::class,
-        'owns-subresource' => \App\Http\Middleware\EnsureUserOwnsSubResource::class,
+        'owns-subresource' => \App\Http\Middleware\EnsureUserOwnsSubresource::class,
     ];
 
     /**
