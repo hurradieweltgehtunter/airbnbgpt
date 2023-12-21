@@ -110,7 +110,7 @@
         <template #content>Jetzt wird's visuell! Lade Fotos der verschiedenen Bereiche deiner Unterkunft hoch. Bitte gib nach dem Upload jedem Bild ein Label, um zu zeigen, welcher Raum abgebildet ist. Unsere KI analysiert deine Fotos und nutzt sie, um ansprechende Inseratstexte zu erstellen. Gute, klare Bilder von jedem Zimmer helfen der KI, die Einzigartigkeit deiner Unterkunft hervorzuheben – weniger Tipparbeit für dich!</template>
     </PageIntro>
 
-    <Uppy :onUploadSuccess="onUploadSuccess" :meta="{ 'housingId': housing.data.id }" :XHRconfig="XHRconfig" :maxFiles="10"></Uppy>
+    <Uppy :onUploadSuccess="onUploadSuccess" :meta="{ 'housingId': housing.data.id }" :XHRconfig="XHRconfig" :maxNumberOfFiles="10"></Uppy>
 
     <form @submit.prevent="createRooms">
       <div class="flex justify-end items-center my-4">

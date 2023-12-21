@@ -6,6 +6,7 @@ use App\Models\Housing;
 use App\Models\HousingImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class HousingImageController extends Controller
 {
@@ -30,10 +31,15 @@ class HousingImageController extends Controller
         $mime = $request->file('file')->getMimeType();
 
         // Validieren Sie den Antrag
-        $request->validate([
-            'file' => 'required|mimes:jpeg,png,jpg,svg,pdf|max:2048', // Maximale Größe ist 2MB
-            // 'housingId' => 'required|integer|exists:rousings,id',
-        ]);
+        try {
+            $request->validate([
+                'file' => 'required|mimes:jpeg,png,jpg|max:4096', // Maximale Größe ist 2MB
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Es ist ein Fehler aufgetreten:' . $e->getMessage()
+            ], 500);
+        }
 
         $path = $request->file('file')->store('public'); // speichert die Datei im "uploads"-Verzeichnis im Storage
         $url = Storage::url($path);

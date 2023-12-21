@@ -4,6 +4,7 @@
   import DragDrop from '@uppy/drag-drop';
   import Dashboard from '@uppy/dashboard';
   import XHR from '@uppy/xhr-upload';
+  import German from '@uppy/locales/lib/de_DE';
 
   // Don't forget the CSS: core and UI components + plugins you are using
   import '@uppy/core/dist/style.css';
@@ -40,19 +41,32 @@
         console.log('onProgress: ', progress);
       }
     },
-    maxFiles: {
+    maxNumberOfFiles: {
       type: Number,
       required: false,
       default: 1
+    },
+    maxFileSize: {
+      type: Number,
+      required: false,
+      default: 4194304 // 4MB: If you change this, change also the backend validation
+    },
+    allowedFileTypes: {
+      type: Array,
+      required: false,
+      default: ['image/jpg', 'image/jpeg', 'image/png']
     },
   })
 
   onMounted (async () => {
     const uppy = new Uppy({
       logger: debugLogger,
+      locale: German,
       meta: props.meta,
       restrictions: {
-        maxNumberOfFiles: props.maxFiles
+        maxNumberOfFiles: props.maxNumberOfFiles,
+        maxFileSize: props.maxFileSize,
+        allowedFileTypes: props.allowedFileTypes
       }
     })
     .use(Dashboard, {
@@ -60,12 +74,12 @@
       target: "#uppy",
       showProgressDetails: true,
       proudlyDisplayPoweredByUppy: false,
-      note: 'Images JPG only, up to 1 MB',
+      note: 'Images JPG only, up to 4 MB',
       height: 200,
       width: "100%",
       locale: {
         strings: {
-          dropPasteFiles: 'Lege Bilder deiner Unterkunft hier ab oder %{browseFiles} (max. 10 Bilder)',
+          dropPasteFiles: 'Lege Bilder deiner Unterkunft hier ab oder %{browseFiles} (max. 10 Bilder, max.4MB pro Bild)',
           browseFiles: 'wähle Bilder aus'
         }
       }
