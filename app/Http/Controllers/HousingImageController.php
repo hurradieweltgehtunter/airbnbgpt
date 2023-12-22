@@ -7,6 +7,8 @@ use App\Models\HousingImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Spatie\Image\Image;
+use Spatie\Image\Manipulations;
 
 class HousingImageController extends Controller
 {
@@ -42,6 +44,13 @@ class HousingImageController extends Controller
         }
 
         $path = $request->file('file')->store('public'); // speichert die Datei im "uploads"-Verzeichnis im Storage
+
+        // Check dimensions
+        $image = Image::load(storage_path('app/' . $path));
+        $image->fit(Manipulations::FIT_MAX, 2048, 2048);
+        $image->save();
+        // Image manipulation done
+
         $url = Storage::url($path);
 
         $image = new HousingImage();
