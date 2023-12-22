@@ -72,18 +72,18 @@
       <p class="text-sm">· {{ housing.data.address_street }} {{ housing.data.address_street_number }}, {{ housing.data.address_city }}, {{ housing.data.address_administrative_area_level_1  }}, {{ housing.data.address_country }}</p>
     </div>
 
-    <!-- <div class="flex space-x-4 my-4 relative">
+    <div class="flex space-x-4 my-4 relative">
       <div class="w-1/2">
         <img :src="housing.images.value[0].data.path" alt="Hauptbild" class="rounded-lg shadow-md">
       </div>
       <div class="w-1/2 grid grid-cols-2 gap-1 sm:col-span-1">
         <img
-          v-for="index in 4"
+          v-for="index in housing.images.value.length - 1"
           :key="index"
           class="rounded-lg shadow-md"
           :src="housing.images.value[index].data.path" />
       </div>
-    </div> -->
+    </div>
 
     <div v-if="hasContentTexts">
       <!-- Remove when GPT4-vision has function_calling -->
