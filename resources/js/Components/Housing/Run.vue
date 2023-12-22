@@ -1,6 +1,7 @@
 <script setup>
-  import { onMounted, defineProps, ref } from 'vue';
+  import { onMounted, defineProps, ref, computed, watch } from 'vue';
   import { Head, router, usePage } from '@inertiajs/vue3'
+  import Agent from '@/Models/Agent'
 
   const page = usePage()
   const emit = defineEmits(['loading', 'setProgress'])
@@ -19,38 +20,55 @@
       type: Object,
       required: false,
       default: () => null
-    }
+    },
   })
 
-  const messages = ref([])
-
-  const handleRoomReceived = (room) => {
-    messages.value.push(room.name + ' erledigt')
-  }
+  const agents = ref([])
 
   onMounted(async () => {
-    let requests = props.housing.agents.map((agent) => {
-      agent.EE.on('room_received', handleRoomReceived);
-      agent.run()
+    // transform the raw agent data to agent class
+    page.props.agents.forEach((agent) => {
+      agents.value.push(new Agent(agent))
     })
 
-    Promise.all(requests)
-    .then(axiosResponses => {
-      router.get('/housings/' + props.housing.data.id)
-    })
-    .catch(error => {
-      console.error("Ein Fehler bei den Requests ist aufgetreten:", error);
-    });
+    startAgents()
   })
 
+  /**
+   * Get the number of running agents
+   */
+  const runningAgentsLength = computed(() => {
+    return agents.value.filter((agent) => agent.finished === false).length
+  })
+
+  /**
+   * Start all available agents
+   */
+  const startAgents = () => {
+    const runningAgents = ref([])
+
+    agents.value.forEach((agent) => {
+      runningAgents.value.push(agent.run())
+    })
+
+    Promise.all(runningAgents.value)
+      .then(() => {
+        router.get(route('housings.show', props.housing.data.id))
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
 
 </script>
 
 <template>
-  <div>
+  <div class="h-full flex items-center justify-center">
     <Head title="Inserat wird erstellt…" />
-    <p v-for="(message, index) in messages" :key="index">{{ message }}</p>
-
+    <div class="text-center">
+      Dein Inserat wird jetzt erstellt. Bitte warte einen Moment.
+      <p>{{ runningAgentsLength }} Tasks werden ausgeführt</p>
+    </div>
   </div>
 
 </template>
