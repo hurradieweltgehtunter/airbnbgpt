@@ -28,29 +28,6 @@ class HousingQuestionnaireAgent extends Agent
      * Init the agent. This method gets only called on agent creation (Agent::createFromName)
      */
     public function init() {
-
-        // Add the address to the conversation
-        $content = 'Die Adresse meiner Unterkunft lautet: ';
-
-        $content .= $this->agentable->address_street . ' ' . $this->agentable->address_street_number . ',';
-        $content .= ' ' . $this->agentable->address_zip . ' ' . $this->agentable->address_city;
-
-        if($this->agentable->address_sublocality_level_1)
-            $content .= ' ' . $this->agentable->address_sublocality_level_1 . ',';
-
-        if($this->agentable->address_administrative_area_level_1)
-            $content .= ' ' . $this->agentable->address_administrative_area_level_1 . ',';
-
-        $content .= ' ' . $this->agentable->address_country . '. ';
-
-        $message = new Message();
-        $message->agent_id = $this->id;
-        $message->role = 'user';
-        $message->sender_id = Auth::id();
-        $message->content = $content;
-
-        $message->save();
-
         // Add the known rooms to the conversation
         $content = 'In meiner Unterkunft gibt es folgende Bereiche: ' . "\n";
 
