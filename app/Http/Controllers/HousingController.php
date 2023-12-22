@@ -321,16 +321,16 @@ class HousingController extends Controller
         return redirect()->route('housings.run', ['housing' => $housing]);
     }
 
+    /**
+     * Method to run the agents and create the texts
+     */
     public function run (Request $request, Housing $housing) {
         Log::debug('HousingController@run: Start running housing ' . $housing->id);
 
-        // Load the housings` all finished agents
-        $housing = Housing::with(['agents' => function ($query) {
-            $query->where('has_finished', false);
-        }])->find($housing->id);
+        $agents = $housing->agents()->where('has_finished', false)->get();
 
-        Log::debug('HousingController@run: Found ' . $housing->agents->count() . ' open agents for housing ' . $housing->id);
-        return Inertia::render('Housing', ['section' => 'run', 'housing' => $housing]);
+        Log::debug('HousingController@run: Found ' . count($agents) . ' open agents for housing ' . $housing->id);
+        return Inertia::render('Housing', ['section' => 'run', 'housing' => $housing, 'agents' => $agents]);
     }
 }
 
