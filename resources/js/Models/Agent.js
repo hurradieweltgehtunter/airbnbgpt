@@ -1,10 +1,8 @@
 import { reactive, ref } from 'vue';
-import { router } from '@inertiajs/vue3'
-import EventEmitter from 'eventemitter3'
 
 export default class Agent {
   constructor(data = {}) {
-
+    this.finished = false;
     this.data = reactive({
       id: null,
       entity: '',
@@ -17,37 +15,28 @@ export default class Agent {
         this.data[key] = data[key];
       }
     });
-
-    this.EE = new EventEmitter()
   }
 
   /**
    * Executes the agent
    */
   async run(postData = null) {
-    try {
-      if(this.data.name === 'ImageDescriptionAgent') {
-        this.rooms = ref([]);
-
-        const eventSource = new EventSource(`/api/agents/${this.data.id}/run`);
-
-        eventSource.onmessage = (event) => {
-          this.EE.emit('room_received', JSON.parse(event.data).room)
-          this.rooms.push(event.data);
-        };
-
-        eventSource.onerror = (error) => {
-            console.error('EventSource failed:', error);
-            eventSource.close();
-        };
-      } else {
-        const response = await axios.post(`/api/agents/${this.data.id}/run`, postData);
-        if(response)
-            return response.data;
+    this.finished = false
+    return new Promise((resolve, reject) => {
+      try {
+        this.finished = false;
+        axios.post(`/api/agents/${this.data.id}/run`, postData)
+        .then(response => {
+          this.finished = true;
+          if(response && response.data)
+            resolve(response.data);
+          else
+            resolve(true);
+        })
+      } catch (error) {
+        reject(error);
       }
-    } catch (error) {
-      console.error(error);
-    }
+    })
   }
 }
 
