@@ -77,7 +77,7 @@ class WriterAllinOneAgent extends Agent
         // save $response to text file in storage
         // Storage::put('AllinOneWriterResponse.txt', print_r($response, true));
 
-        if(isset($response->toolCalls)) {
+        if(isset($response->toolCalls) && count($response->toolCalls) > 0) {
             $arguments = json_decode($response->toolCalls[0]->function->arguments);
 
             $functionName = $response->toolCalls[0]->function->name;
