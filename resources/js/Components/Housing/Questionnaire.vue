@@ -99,6 +99,9 @@
   }
 
   const handleResponse = async (response) => {
+    if(response === false) {
+      return false
+    }
     if(response.type !== 'message' && response.type !== 'redirect') { // redirect gets catched by axios interceptor
         console.error('Unknown response type: ', response.type)
         return false
