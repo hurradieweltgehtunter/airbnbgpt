@@ -69,14 +69,14 @@ class ImageAnalyzerAgent extends Agent
 
             $this->addMessage($message);
 
-            Log::debug('ImageAnalyzer sends message to AI. Conversation:');
             foreach($this->conversation->getAllMessages() as $message) {
                 Log::debug($message->role . ': ' . print_r($message->content, true));
             }
 
             [$returnMessage, $agentUsage] = parent::run();
 
-            // get the room to $housing with label $label
+            Log::debug('ImageAnalyzer received message from AI: ' . $returnMessage->content);
+
             $room->description = parent::fixUmlauts($returnMessage->content);
             $room->save();
 
