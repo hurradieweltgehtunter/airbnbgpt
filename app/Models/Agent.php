@@ -17,8 +17,6 @@ use App\Models\AgentUsage;
 
 class Agent extends Model
 {
-    use HasFactory;
-
     protected $table = 'agents';
 
     protected $fillable = [
@@ -229,7 +227,12 @@ class Agent extends Model
                 OpenAI::fake([
                     CreateResponse::fake($fakeResponse),
                 ]);
+
+                sleep(3);
             }
+
+            Log::debug('Agent::run: sending AI message for agent ' . get_class($this) . ' to OpenAI API');
+            Log::debug((array) $params);
 
             $AIResponse = OpenAI::chat()->create($params);
 
