@@ -2,26 +2,24 @@
 
 namespace App\Agents;
 
-use App\Models\Agent;
-
-use App\Http\Resources\HousingRoomResource;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Interfaces\AgentInterface;
 use App\Custom\Conversation;
-use App\Services\AgentService;
-use Illuminate\Support\Facades\Auth;
-use OpenAI\Laravel\Facades\OpenAI;
+use App\Http\Resources\HousingRoomResource;
+use App\Models\Agent;
 use App\Models\Message;
+use App\Services\AgentService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-
+use OpenAI\Laravel\Facades\OpenAI;
 
 /**
  * This agent analyzes images and ...?!
  */
-class ImageAnalyzerAgent extends Agent
+class ImageAnalyzerAgent extends Agent implements AgentInterface
 {
-    public function run($data = null) {
+    public function run(array $data = null) {
         $response = [];
 
         // Load all images from the housing
@@ -93,7 +91,8 @@ class ImageAnalyzerAgent extends Agent
         return $this->finished();
     }
 
-    public function finished() {
+    public function finished() : array
+    {
         Log::debug('ImageAnalyzerAgent::finished()');
         return ['type' => 'redirect', 'url' => route('housings.showQuestionnaire', $this->agentable->id, false)];
     }

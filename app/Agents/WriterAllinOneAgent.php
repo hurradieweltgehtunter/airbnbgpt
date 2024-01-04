@@ -2,29 +2,41 @@
 
 namespace App\Agents;
 
-use App\Models\Agent;
-use App\Models\Message;
-use App\Models\Housing;
-use App\Models\WritingStyle;
-
-use App\Http\Resources\HousingRoomResource;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Interfaces\AgentInterface;
 use App\Custom\Conversation;
+use App\Http\Resources\HousingRoomResource;
+use App\Models\Agent;
+use App\Models\Housing;
+use App\Models\HousingContent;
+use App\Models\Message;
+use App\Models\WritingStyle;
+use App\Models\WritingStyleExample;
 use App\Services\AgentService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use OpenAI\Laravel\Facades\OpenAI;
 use OpenAI\Responses\Chat\CreateResponse;
-use Illuminate\Support\Facades\Log;
-use App\Models\WritingStyleExample;
-use App\Models\HousingContent;
-use Illuminate\Support\Facades\Storage;
 
-class WriterAllinOneAgent extends Agent
+class WriterAllinOneAgent extends Agent implements AgentInterface
 {
-
     public $writingStyle;
+
+    /**
+     * Init Method is only called when the agent is newly created. Not when it is loaded from the database
+     */
+    public function init() {}
+
+    /**
+     * Initializes the agent on runtime
+     */
+    public function initRuntime()
+    {
+        parent::initRuntime();
+        $this->writingStyle = $this->writingStyle()->first();
+    }
 
     public function getWritingStyleIdAttribute()
     {
@@ -44,26 +56,13 @@ class WriterAllinOneAgent extends Agent
         return null;
     }
 
-    public function initRuntime() {
-        parent::initRuntime();
-        $this->writingStyle = $this->writingStyle()->first();
-
-    }
-
-    /**
-     * Init Method is only called when the agent is newly created. Not when it is loaded from the database
-     */
-    public function init() {
-
-    }
-
     /**
      * Run Method is called every time the agent is run
      *
      * @param $data: The data from the request:
      * useWritingStyle: int ID of writingStyle to use
      */
-    public function run($data = null) {
+    public function run(array $data = null) {
         if($data === null) {
             throw new \Exception('No writing Style provided');
         }
@@ -281,7 +280,8 @@ class WriterAllinOneAgent extends Agent
         return $placeholders[1];
     }
 
-    public function finished() {
+    public function finished() : array
+    {
         // return json response
         return response()->json(['type' => 'redirect', 'url' => route('housings.show', ['housing' => $this->agentable], false)]);
     }

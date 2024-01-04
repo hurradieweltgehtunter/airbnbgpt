@@ -2,30 +2,26 @@
 
 namespace App\Agents;
 
-use App\Models\Agent;
-
-use App\Http\Resources\HousingRoomResource;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Interfaces\AgentInterface;
 use App\Custom\Conversation;
+use App\Http\Resources\HousingRoomResource;
+use App\Models\Agent;
+use App\Models\HousingContent;
+use App\Models\Message;
 use App\Services\AgentService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use OpenAI\Laravel\Facades\OpenAI;
-use App\Models\Message;
 
-use App\Models\HousingContent;
-
-class WriterAgent extends Agent
+class WriterAgent extends Agent implements AgentInterface
 {
     /**
      * Init Method is only called when the agent is newly created. Not when it is loaded from the database
      */
-    public function init() {
+    public function init() {}
 
-    }
-
-    public function run() {
+    public function run(array $data = null) {
         $this->prepareMessages();
 
         // echo each message as role: content
@@ -149,5 +145,10 @@ class WriterAgent extends Agent
         $placeholders = array();
         preg_match_all('/{{(.*?)}}/', $text, $placeholders);
         return $placeholders[1];
+    }
+
+    public function finished() : bool
+    {
+        return true;
     }
 }

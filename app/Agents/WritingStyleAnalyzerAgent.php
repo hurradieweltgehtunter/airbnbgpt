@@ -2,27 +2,34 @@
 
 namespace App\Agents;
 
-use App\Models\Agent;
-
-use App\Http\Resources\HousingRoomResource;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Interfaces\AgentInterface;
 use App\Custom\Conversation;
-use App\Services\AgentService;
-use Illuminate\Support\Facades\Auth;
-use OpenAI\Laravel\Facades\OpenAI;
+use App\Http\Resources\HousingRoomResource;
+use App\Models\Agent;
 use App\Models\Message;
 use App\Models\WritingStyle;
+use App\Services\AgentService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use OpenAI\Laravel\Facades\OpenAI;
 
-class WritingStyleAnalyzerAgent extends Agent
+class WritingStyleAnalyzerAgent extends Agent implements AgentInterface
 {
+    /**
+     * Init Method is only called when the agent is newly created. Not when it is loaded from the database.
+     */
+    public function init()
+    {
+
+    }
+
     /**
      * The attributes that are mass assignable.
      *
      * $data string The text to analyze
      */
-    public function run($data = null) : WritingStyle {
+    public function run(array $data = null) : WritingStyle {
         $this->initRuntime();
         $response = [];
         // $writingStyle = $this->agentable;
@@ -73,7 +80,8 @@ class WritingStyleAnalyzerAgent extends Agent
         return [$title, $description];
     }
 
-    public function finished() {
+    public function finished() : \Illuminate\Http\JsonResponse
+    {
         // return WritingStyle as json response
         return response()->json($writingStyle->toArray());
     }

@@ -2,26 +2,24 @@
 
 namespace App\Agents;
 
-use App\Models\Agent;
-use App\Models\WritingStyle;
-
-use App\Http\Resources\HousingRoomResource;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Interfaces\AgentInterface;
 use App\Custom\Conversation;
-use App\Services\AgentService;
-use Illuminate\Support\Facades\Auth;
-use OpenAI\Laravel\Facades\OpenAI;
+use App\Http\Resources\HousingRoomResource;
+use App\Models\Agent;
 use App\Models\Message;
+use App\Models\WritingStyle;
+use App\Services\AgentService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use OpenAI\Laravel\Facades\OpenAI;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-
 /**
  * This agent is responsible for analyzing the images of a housing and generating a description for each image
  */
 
-class ImageDescriptionAgent extends Agent
+class ImageDescriptionAgent extends Agent implements AgentInterface
 {
     public $writingStyle;
 
@@ -43,7 +41,7 @@ class ImageDescriptionAgent extends Agent
         return null;
     }
 
-    public function run($data = null) {
+    public function run(array $data = null) {
         $response = [];
 
         // Load all images from the housing
@@ -120,7 +118,8 @@ class ImageDescriptionAgent extends Agent
         return true;
     }
 
-    public function finished() {
+    public function finished() : bool
+    {
         Log::debug('ImageAnalyzerAgent::finished()');
         return true;
     }

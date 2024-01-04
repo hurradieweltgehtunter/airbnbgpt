@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Agent;
-use Illuminate\Http\Request;
-use App\Models\Housing;
 use App\Factories\AgentFactory;
 use App\Http\Resources\AgentResource;
+use App\Models\Agent;
+use App\Models\Housing;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -60,13 +60,29 @@ class AgentController extends Controller
         return response()->json(null, 204);
     }
 
-    public function runAgent(Request $request, $agent) {
+    /**
+     * Method to run a specific agent
+     *
+     * @param Request $request
+     * @param Agent $agent
+     * @return mixed
+     */
+    public function runAgent(Request $request, $agent)
+    {
         $data = request()->all();
 
         if($agent->has_finished === true) {
             return $agent->finished();
         }
 
-        return $agent->run($data);
+        try {
+            return $agent->run($data);
+        } catch(\GuzzleHttp\Exception\ConnectException $e)
+        {
+            return response()->json(['error' => 'Timeout in OpenAI API request: ' . $e->getMessage()], 408);
+        } catch(\Exception $e)
+        {
+            return response()->json(['error' => 'Error in OpenAI API request: ' . $e->getMessage()], 500);
+        }
     }
 }

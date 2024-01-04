@@ -51,7 +51,6 @@ class MessageController extends Controller
         })->where('id', Auth::id())->exists();
 
         if (!$userOwnsAgent) {
-            // Der Raum wurde nicht gefunden oder gehört nicht dem angemeldeten Benutzer
             return response()->json(['error' => 'Agent not found or unauthorized'], 404);
         }
 
@@ -68,101 +67,12 @@ class MessageController extends Controller
             'agent_id' => $agent->id,
             'content' => $data['content'],
             'sender_id' => Auth::id(),
-            'sent_at' => now(), // Hier setzen Sie das aktuelle Datum und die Uhrzeit, weil in Ihrem JSON-Beispiel kein vollständiges Datum enthalten war
+            'sent_at' => now(),
             'role' => 'user',
         ]);
         $message->save();
 
         return new MessageResource($message);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     * Updated version for non-chat behaviour
-     */
-    public function store2(Request $request)
-    {
-        $data = $request->all();
-
-        // Make sure, the given housing belongs to the user
-        $housing = auth()->user()->housings()->find($data['housingId']);
-
-        if (!$housing) {
-            // Der Raum wurde nicht gefunden oder gehört nicht dem angemeldeten Benutzer
-            return response()->json(['error' => 'Housing not found or unauthorized'], 404);
-        }
-
-
-
-        // // Speichern der Dateianhänge
-        // if (isset($data['files'])) {
-        //     foreach ($data['files'] as $fileData) {
-        //         $message->files()->create([
-        //             'name' => $fileData['name'],
-        //             'size' => $fileData['size'],
-        //             'type' => $fileData['type'],
-        //             'audio' => $fileData['audio'] ?? false,
-        //             'duration' => $fileData['duration'] ?? 0,
-        //             'url' => $fileData['url'] ?? '',
-        //             'preview_url' => $fileData['preview'] ?? ''
-        //         ]);
-        //     }
-        // }
-
-        // // Speichern der Reaktionen
-        // if (isset($data['reactions'])) {
-        //     foreach ($data['reactions'] as $reaction => $userIds) {
-        //         foreach ($userIds as $userId) {
-        //             $message->reactions()->create([
-        //                 'reaction' => $reaction,
-        //                 'user_id' => $userId
-        //             ]);
-        //         }
-        //     }
-        // }
-
-        // // Wenn es eine Antwortnachricht gibt
-        // if (isset($data['replyMessage'])) {
-        //     $reply = new Message([
-        //         'content' => $data['replyMessage']['content'],
-        //         'senderId' => $data['replyMessage']['senderId'],
-        //         'sent_at' => now(),
-        //         // Restliche Felder...
-        //     ]);
-        //     $reply->save();
-
-        //     foreach ($data['replyMessage']['files'] as $fileData) {
-        //         $reply->files()->create($fileData);
-        //     }
-
-        //     // Setzen Sie die replyMessage_id für die Hauptnachricht
-        //     $message->replyMessage_id = $reply->id;
-        //     $message->save();
-        // }
-
-        $userMessage = new Message([
-            'housing_id' => $data['housingId'],
-            'content' => $data['content'],
-            'senderId' => Auth::id(),
-            'sent_at' => now(),
-            'system' => false,
-            'saved' => true,
-            'distributed' => true,
-            'seen' => true,
-            'deleted' => false,
-            'disableActions' => false,
-            'disableReactions' => false,
-            'role' => 'user',
-        ]);
-
-        $replyMessage = OpenAiFunctions::handleUserMessage($userMessage);
-
-        $replyMessage->senderId = 1;
-        $replyMessage->housing_id = $request->input('housingId');
-
-        $replyMessage->save();
-
-        return new MessageResource($replyMessage);
     }
 
     /**

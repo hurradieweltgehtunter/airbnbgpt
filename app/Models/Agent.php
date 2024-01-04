@@ -2,18 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Custom\Conversation;
-use App\Services\AgentService;
-use Illuminate\Support\Facades\Auth;
-use OpenAI\Laravel\Facades\OpenAI;
 use App\Factories\AgentFactory;
+use App\Models\AgentUsage;
 use App\Models\Message;
+use App\Services\AgentService;
+use App\Services\OpenAIService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use OpenAI\Laravel\Facades\OpenAI;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Testing\ClientFake;
-use App\Models\AgentUsage;
 
 class Agent extends Model
 {
@@ -148,11 +149,7 @@ class Agent extends Model
             $agent->parameters = $parameters;
         }
 
-        // Check if init() exists on $agent
-        if (method_exists($agent, 'init'))
-        {
-            $agent->init();
-        }
+        $agent->init();
 
         if ($entity) {
             $agent->refresh();
@@ -202,7 +199,7 @@ class Agent extends Model
     /**
      * Executes a query to ChatGPT and returns the response
      */
-    public function run($data = null) {
+    public function run(array $data = null) {
         $params = [
             'model' => $this->gptmodel->name,
             'messages' => $this->prepareMessages(),
@@ -215,32 +212,12 @@ class Agent extends Model
         }
 
         try {
-            Log::build([
-                'driver' => 'single',
-                'path' => storage_path('logs/AIRequest.log'),
-              ])->info(print_r($params, true));
 
-            if($this->fake_enabled == true) {
-
-                $fakeResponse = $this->getFakeResponse();
-
-                OpenAI::fake([
-                    CreateResponse::fake($fakeResponse),
-                ]);
-
-                sleep(3);
-            }
-
-            Log::debug('Agent::run: sending AI message for agent ' . get_class($this) . ' to OpenAI API');
-            Log::debug((array) $params);
-
-            $AIResponse = OpenAI::chat()->create($params);
+            $openAIService = new OpenAIService($this->fake_enabled);
+            $AIResponse = $openAIService->runAI($params);
 
             $agentUsage = AgentUsage::create($this, $AIResponse);
             $agentUsage->save();
-
-            Log::debug('Agent::run: received AI message for agent ' . get_class($this));
-            Log::debug((array) $AIResponse);
 
             return [$AIResponse->choices[0]->message, $agentUsage];
         } catch (\Exception $e) {

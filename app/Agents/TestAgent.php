@@ -2,24 +2,22 @@
 
 namespace App\Agents;
 
-use App\Models\Agent;
-
-use App\Http\Resources\HousingRoomResource;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Interfaces\AgentInterface;
 use App\Custom\Conversation;
+use App\Http\Resources\HousingRoomResource;
+use App\Models\Agent;
+use App\Models\HousingContent;
+use App\Models\Message;
 use App\Services\AgentService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use OpenAI\Laravel\Facades\OpenAI;
-use App\Models\Message;
 
-use App\Models\HousingContent;
-
-class TestAgent extends Agent
+class TestAgent extends Agent implements AgentInterface
 {
 
-    public function run($data = null) {
+    public function run(array $data = null) {
 
         [$response, $agentUsage] = parent::run();
 
@@ -62,7 +60,8 @@ class TestAgent extends Agent
         return '';
     }
 
-    public function finished() {
+    public function finished() : bool
+    {
         return true;
     }
 }

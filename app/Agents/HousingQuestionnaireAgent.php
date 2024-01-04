@@ -2,22 +2,21 @@
 
 namespace App\Agents;
 
-use App\Models\Agent;
-
-use App\Http\Resources\HousingRoomResource;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Interfaces\AgentInterface;
 use App\Custom\Conversation;
-use App\Services\AgentService;
-use Illuminate\Support\Facades\Auth;
-use OpenAI\Laravel\Facades\OpenAI;
-use App\Models\Message;
-use App\Http\Resources\MessageResource;
-use Illuminate\Support\Facades\Log;
 use App\Http\Resources\AgentResource;
+use App\Http\Resources\HousingRoomResource;
+use App\Http\Resources\MessageResource;
+use App\Models\Agent;
+use App\Models\Message;
+use App\Services\AgentService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use OpenAI\Laravel\Facades\OpenAI;
 
-class HousingQuestionnaireAgent extends Agent
+class HousingQuestionnaireAgent extends Agent implements AgentInterface
 {
     public function messages()
     {
@@ -47,7 +46,7 @@ class HousingQuestionnaireAgent extends Agent
         $message->save();
     }
 
-    public function run($data = null) {
+    public function run(array $data = null) {
 
         // If the message count is exceeded (e.g. 10 messages), close the agent
         // TODO: Make this tokenbased
@@ -138,7 +137,7 @@ class HousingQuestionnaireAgent extends Agent
      * Method which handles the finished state of the agent.
      * Gets called, if the agent is closed (has_finished = true)
      */
-    public function finished()
+    public function finished() : array
     {
         Log::debug('HousingQuestionnaire::finished()');
         Log::debug('Forwarding to housings.writingstyleSelect with housingId ' . $this->agentable->id);
