@@ -34,6 +34,7 @@
         "pinia": "^2.1.7",
         "vue-advanced-chat": "^2.0.7",
         "vue-axios": "^3.5.2",
-        "vue3-google-map": "^0.18.0"
+        "vue3-google-map": "^0.18.0",
+        "vue3-toastify": "^0.2.1"
     }
 }

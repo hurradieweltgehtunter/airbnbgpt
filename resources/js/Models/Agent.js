@@ -1,4 +1,5 @@
 import { reactive, ref } from 'vue';
+import { toast } from 'vue3-toastify';
 
 export default class Agent {
   constructor(data = {}) {
@@ -22,21 +23,35 @@ export default class Agent {
    */
   async run(postData = null) {
     this.finished = false
-    return new Promise((resolve, reject) => {
-      try {
-        this.finished = false;
-        axios.post(`/api/agents/${this.data.id}/run`, postData)
-        .then(response => {
-          this.finished = true;
-          if(response && response.data)
-            resolve(response.data);
-          else
-            resolve(true);
-        })
-      } catch (error) {
-        reject(error);
+    let response
+    try {
+      response = await axios.post(`/api/agents/${this.data.id}/run`, postData)
+    } catch (error) {
+      switch(error.response.status) {
+        case 408:
+          toast.error('Agent timed out')
+          console.log('Agent timed out')
+          break;
+        case 404:
+          toast.error('Agent not found')
+          console.log('Agent not found')
+          break;
+        case 500:
+          toast.error('Agent error')
+          console.log('Agent error')
+          break;
+        default:
+          toast.error('Unknown error')
+          console.log('Unknown error')
       }
-    })
+      this.finished = true;
+      return false
+    }
+
+    this.finished = true;
+    if(response && response.data)
+        return response.data
+      else
+        return true
   }
 }
-

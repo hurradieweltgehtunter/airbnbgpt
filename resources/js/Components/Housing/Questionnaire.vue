@@ -60,51 +60,80 @@
     sendMessage()
   }
 
-  // Method to send a message
-  const sendMessage = async () => {
-    emit('loading', true, loadingMessage.value)
-
+  /**
+   * Creates a message object from the user input.
+   * @returns {object} The message object.
+   */
+  const createMessage = () => {
+    // Check, if the user has selected checkboxes.
     if(userInputBox.value.length > 0) {
+      // If so, add the values to the user input.
       userInput.value += "\n" + userInputBox.value.join(', ')
       userInputBox.value = []
     }
 
-    if(userInput.value === '') {
-      console.log('No input!')
+    let userMessage = {
+  	  senderId: user.value.id,
+  	  content: userInput.value,
+    }
+
+    return userMessage
+  }
+
+  /**
+   * Sends the user message to the backend and runs the agent.
+   *
+   * @returns {void}
+   */
+  const sendMessage = async () => {
+    emit('loading', true, loadingMessage.value)
+
+    let userMessage = createMessage();
+
+    if(userMessage.content === '') {
       emit('loading', false)
       return
     }
 
-    let date = new Date();
-    let day = date.getDate();  // Gibt den Tag des Monats zurück
-    let month = date.toLocaleString('default', { month: 'long' });  // Gibt den Namen des Monats zurück
-    let hours = date.getHours().toString().padStart(2, '0');  // Gibt die Stunden zurück
-    let minutes = date.getMinutes().toString().padStart(2, '0');  // Gibt die Minuten zurück
-
-    let formattedTime = `${hours}:${minutes}`;  // Formatieren der Uhrzeit
-    let formattedDate = `${day} ${month}`;  // Formatieren des Datums
-
-    let userMessage = {
-  	  senderId: user.value.id,
-  	  content: userInput.value,
-      date: formattedDate,
-  	  timestamp: formattedTime,
+    // Store the user message
+    // Todo: Error handling
+    let response
+    try {
+      response = await axios.post(`/api/agents/${agent.data.id}/messages`, userMessage)
+    } catch (error) {
+      switch(error.response.status) {
+        case 400:
+          console.error('Content too long')
+          break;
+        case 404:
+          console.error('Agent not found')
+        default:
+          console.error('Unknown error')
+      }
+      return
     }
 
-    let response = await axios.post(`/api/agents/${agent.data.id}/messages`, userMessage)
-
+    // Run the agent -> Query the AI
     response = await agent.run()
+
     if(await handleResponse(response) !== false)
-        emit('loading', false)
+      emit('loading', false)
   }
 
+  /**
+   * Handles the agent response from the backend
+   *
+   * @param {object} response The response from the backend
+   * @returns {boolean} Returns false if the response is invalid
+   */
   const handleResponse = async (response) => {
     if(response === false) {
       return false
     }
+
     if(response.type !== 'message' && response.type !== 'redirect') { // redirect gets catched by axios interceptor
-        console.error('Unknown response type: ', response.type)
-        return false
+      console.error('Unknown response type: ', response.type)
+      return false
     }
 
     message.value = new Message(response.message)
@@ -121,7 +150,6 @@
 
   const hasFreetext = computed(() => {
     return true
-    // return message.value.data.meta.hasFreetext
   })
 
   const options = computed(() => {
